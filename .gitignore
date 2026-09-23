@@ -1,0 +1,8 @@
+node_modules/
+.next/
+.env.local
+*.log
+
+# Keep project documentation tracked.
+!docs/
+!docs/**
