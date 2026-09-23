@@ -23,6 +23,8 @@ export function detectPortal() {
 }
 
 export function getDefaultPortal() {
+  const detected = detectPortal();
+  if (detected) return detected;
   return APP_PORTAL === 'student' ? 'student' : 'staff';
 }
 
