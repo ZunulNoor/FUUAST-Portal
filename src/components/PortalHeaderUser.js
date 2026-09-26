@@ -4,6 +4,7 @@ import { LogOut, UserRound } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/authStore';
 import { headerUser } from '@/components/ui/cx';
+import NotificationsBell from './NotificationsBell';
 
 export default function PortalHeaderUser({ portal = 'staff' }) {
   const user = useAuthStore((state) => state.user);
@@ -17,6 +18,7 @@ export default function PortalHeaderUser({ portal = 'staff' }) {
 
   return (
     <div className="flex shrink-0 items-center gap-3 max-xl:gap-2">
+      <NotificationsBell portal={portal} />
       <div className={headerUser}>
         <UserRound size={17} />
         <span className="max-w-[150px] truncate max-md:max-w-[90px]">

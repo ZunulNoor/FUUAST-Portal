@@ -7,7 +7,7 @@ import { staffApi } from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
 import { canAccessStaffResource } from '@/lib/staffAccess';
 import PortalSidebar from './PortalSidebar';
-import PortalHeaderUser from './PortalHeaderUser';
+import PageHeader from './PageHeader';
 import { useConfirm } from '@/components/providers/ConfirmProvider';
 import { useToastStore } from '@/store/toastStore';
 import Button from '@/components/ui/Button';
@@ -15,10 +15,7 @@ import { inputClass } from '@/components/ui/Field';
 import {
   panel,
   portalMain,
-  portalHeader,
   portalContent,
-  headerTitle,
-  headerSub,
   eyebrow,
   formError,
   errorTop,
@@ -118,17 +115,15 @@ export default function ScopedSettingPage({ setting = 'threshold' }) {
     <>
       <PortalSidebar portal="staff" />
       <main className={portalMain}>
-        <header className={portalHeader}>
-          <div>
-            <h1 className={headerTitle}>{isThreshold ? 'Attendance thresholds' : 'Edit window settings'}</h1>
-            <p className={headerSub}>
-              {isThreshold
-                ? 'Set the required attendance percentage by scope.'
-                : 'Control how long teachers may correct their own attendance.'}
-            </p>
-          </div>
-          <PortalHeaderUser portal="staff" />
-        </header>
+        <PageHeader
+          title={isThreshold ? 'Attendance thresholds' : 'Edit window settings'}
+          description={
+            isThreshold
+              ? 'Set the required attendance percentage by scope.'
+              : 'Control how long teachers may correct their own attendance.'
+          }
+          portal="staff"
+        />
         <div className={portalContent}>
           <section className={`${panel} max-w-[680px] p-[28px]`}>
             <span className={eyebrow}>

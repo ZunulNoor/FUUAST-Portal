@@ -1,21 +1,31 @@
 import axios from 'axios';
 import { useAuthStore } from '../store/authStore';
-import { getStudentApiBaseUrl, getStaffApiBaseUrl } from './ApiConfig';
+import { PROXY_BASE_URL, PORTAL_BACKEND } from './ApiConfig';
 
-const STUDENT_BASE_URL = getStudentApiBaseUrl();
-const STAFF_BASE_URL = getStaffApiBaseUrl();
+// Browser talks same-origin to /api/backend; `x-backend` picks the upstream server-side.
+const PROXY_BASE = PROXY_BASE_URL;
 
 export const studentApi = axios.create({
-  baseURL: STUDENT_BASE_URL,
+  baseURL: PROXY_BASE,
   headers: {
     'Content-Type': 'application/json',
+    'x-backend': PORTAL_BACKEND.student,
   },
 });
 
 export const staffApi = axios.create({
-  baseURL: STAFF_BASE_URL,
+  baseURL: PROXY_BASE,
   headers: {
     'Content-Type': 'application/json',
+    'x-backend': PORTAL_BACKEND.staff,
+  },
+});
+
+export const leaveApi = axios.create({
+  baseURL: PROXY_BASE,
+  headers: {
+    'Content-Type': 'application/json',
+    'x-backend': 'leave',
   },
 });
 
@@ -41,11 +51,12 @@ const attachTokenInterceptor = (client) => {
         if (refreshToken) {
           try {
             const isStudent = useAuthStore.getState().user?.role === 'student';
-            const refreshEndpoint = isStudent
-              ? `${STUDENT_BASE_URL}/auth/refresh`
-              : `${STAFF_BASE_URL}/auth/refresh`;
 
-            const res = await axios.post(refreshEndpoint, { refreshToken });
+            const res = await axios.post(
+              `${PROXY_BASE}/auth/refresh`,
+              { refreshToken },
+              { headers: { 'x-backend': isStudent ? PORTAL_BACKEND.student : PORTAL_BACKEND.staff } },
+            );
             const newAccessToken = res.data.accessToken;
             const newRefreshToken = res.data.refreshToken || refreshToken;
 
@@ -76,6 +87,7 @@ const attachTokenInterceptor = (client) => {
 
 attachTokenInterceptor(studentApi);
 attachTokenInterceptor(staffApi);
+attachTokenInterceptor(leaveApi);
 
 export const getApiClient = (role) => {
   return role === 'student' ? studentApi : staffApi;

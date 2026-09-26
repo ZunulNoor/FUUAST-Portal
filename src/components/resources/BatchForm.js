@@ -4,7 +4,7 @@ import Field, { inputClass } from '@/components/ui/Field';
 import FieldInput from './FieldInput';
 import BatchSemestersManager from './BatchSemestersManager';
 
-const sectionOptions = ['A', 'B', 'C'];
+const sectionOptions = ['A', 'B', 'C', 'D', 'E', 'F'];
 
 export default function BatchForm({
   config,

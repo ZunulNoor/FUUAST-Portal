@@ -5,7 +5,7 @@ import { Plus, RefreshCw, Download, FileDown, Upload, AlertTriangle } from 'luci
 import { useAuthStore } from '@/store/authStore';
 import { canAccessStaffResource } from '@/lib/staffAccess';
 import PortalSidebar from './PortalSidebar';
-import PortalHeaderUser from './PortalHeaderUser';
+import PageHeader from './PageHeader';
 import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
 import useResourceData from '@/hooks/useResourceData';
@@ -14,14 +14,12 @@ import ResourceTable from '@/components/resources/ResourceTable';
 import ResourceFormModal from '@/components/resources/ResourceFormModal';
 import DetailModal from '@/components/resources/DetailModal';
 import TimetableGrid from '@/components/resources/TimetableGrid';
+import CoordinatorManageModal from '@/components/CoordinatorManageModal';
 import {
   panel,
   portalMain,
-  portalHeader,
   portalContent,
   portalContentWide,
-  headerTitle,
-  headerSub,
   eyebrow,
 } from '@/components/ui/cx';
 
@@ -30,6 +28,7 @@ export default function StaffResourcePage({ resource }) {
   const hydrated = useAuthStore((state) => state.hydrated);
   const data = useResourceData(resource);
   const [timetableView, setTimetableView] = useState('grid');
+  const [coordinatorTeacher, setCoordinatorTeacher] = useState(null);
 
   const {
     roleConfig,
@@ -89,6 +88,11 @@ export default function StaffResourcePage({ resource }) {
   )
     return null;
 
+  const canManageCoordinator =
+    resource === 'teachers' &&
+    roleConfig.coordinator &&
+    (roleConfig.coordinator.roles || []).includes(user.role);
+
   const showToolbar =
     roleConfig.searchable || ['teachers', 'batches', 'timetable'].includes(resource);
 
@@ -96,13 +100,7 @@ export default function StaffResourcePage({ resource }) {
     <>
       <PortalSidebar portal="staff" />
       <main className={portalMain}>
-        <header className={portalHeader}>
-          <div>
-            <h1 className={headerTitle}>{roleConfig.title}</h1>
-            <p className={headerSub}>{roleConfig.description}</p>
-          </div>
-          <PortalHeaderUser portal="staff" />
-        </header>
+        <PageHeader title={roleConfig.title} description={roleConfig.description} portal="staff" />
         <div className={resource === 'students' ? portalContentWide : portalContent}>
           <section className={`${panel} p-6`}>
             <div className="flex flex-wrap items-start justify-between gap-3">
@@ -204,9 +202,11 @@ export default function StaffResourcePage({ resource }) {
                   rows={rows}
                   roleConfig={roleConfig}
                   canEdit={canEdit}
+                  canManageCoordinator={canManageCoordinator}
                   onView={openDetail}
                   onEdit={openForm}
                   onDelete={remove}
+                  onManageCoordinator={setCoordinatorTeacher}
                   page={page}
                   pagination={pagination}
                   onChangePage={setPage}
@@ -242,6 +242,17 @@ export default function StaffResourcePage({ resource }) {
           courses={detailCourses}
           loading={detailLoading}
           onClose={() => setDetailStudent(null)}
+        />
+      ) : null}
+      {coordinatorTeacher ? (
+        <CoordinatorManageModal
+          teacher={coordinatorTeacher}
+          user={user}
+          onClose={() => setCoordinatorTeacher(null)}
+          onSaved={() => {
+            setCoordinatorTeacher(null);
+            data.load();
+          }}
         />
       ) : null}
       {importReport ? (

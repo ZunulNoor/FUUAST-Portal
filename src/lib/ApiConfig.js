@@ -1,20 +1,18 @@
+export const PROXY_BASE_URL = '/api/backend';
+
+export const PORTAL_BACKEND = {
+  student: 'student',
+  staff: 'staff',
+};
+
 const BACKEND_URLS = {
-  student: 'https://student.attendance.petzone.pk/api',
-  staff: 'https://staff.petzone.pk/api',
+  student: 'student upstream (server-only STUDENT_API_URL)',
+  staff: 'staff upstream (server-only STAFF_API_URL)',
 };
 
 export const API_ENVIRONMENTS = {
-  staging: {
-    ...BACKEND_URLS,
-  },
-  production: {
-    ...BACKEND_URLS,
-  },
-};
-
-const ENV_OVERRIDES = {
-  student: process.env.NEXT_PUBLIC_API_STUDENT_URL,
-  staff: process.env.NEXT_PUBLIC_API_STAFF_URL,
+  staging: { ...BACKEND_URLS },
+  production: { ...BACKEND_URLS },
 };
 
 export function isLocalDevelopment() {
@@ -30,7 +28,8 @@ export function getEnvironment() {
 }
 
 export function getApiBaseUrl(portal) {
-  return ENV_OVERRIDES[portal] || API_ENVIRONMENTS[getEnvironment()][portal];
+  void portal;
+  return PROXY_BASE_URL;
 }
 
 export function getStudentApiBaseUrl() {
@@ -39,4 +38,8 @@ export function getStudentApiBaseUrl() {
 
 export function getStaffApiBaseUrl() {
   return getApiBaseUrl('staff');
+}
+
+export function getBackendHeader(portal) {
+  return PORTAL_BACKEND[portal] || PORTAL_BACKEND.staff;
 }

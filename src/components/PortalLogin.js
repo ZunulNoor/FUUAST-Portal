@@ -1,12 +1,12 @@
 'use client';
 
-import Link from 'next/link';
-import { ArrowLeft, Eye, EyeOff, KeyRound, Loader2, ShieldCheck } from 'lucide-react';
+import { Eye, EyeOff, KeyRound, Loader2, RefreshCw, ShieldCheck } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { staffApi, studentApi } from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
 import PortalBrand from './PortalBrand';
+import StudentLookupForm from './StudentLookupForm';
 import Modal from '@/components/ui/Modal';
 import { inputClass } from '@/components/ui/Field';
 import { formError, kicker } from '@/components/ui/cx';
@@ -22,6 +22,37 @@ export default function PortalLogin({ portal }) {
   const [error, setError] = useState('');
   const [mustReset, setMustReset] = useState(false);
   const [newPassword, setNewPassword] = useState('');
+  const [captcha, setCaptcha] = useState(null);
+  const [captchaAnswer, setCaptchaAnswer] = useState('');
+  // True once the backend proves it serves captchas. Stays false on legacy
+  // backends (404) so login keeps working until the server is redeployed.
+  const [captchaRequired, setCaptchaRequired] = useState(true);
+  // Students land on seat+captcha lookup; password sign-in is secondary.
+  const [authMode, setAuthMode] = useState('lookup');
+  const showLookup = isStudent && authMode === 'lookup';
+
+  const loadCaptcha = async () => {
+    if (isStudent) return;
+    try {
+      const response = await api.get('/auth/captcha');
+      setCaptcha(response.data);
+      setCaptchaAnswer('');
+      setCaptchaRequired(true);
+    } catch (requestError) {
+      if (requestError.response?.status === 404) {
+        // Legacy backend without captcha support — log in without it.
+        setCaptchaRequired(false);
+        setCaptcha(null);
+      } else {
+        setCaptcha(null);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (!isStudent) loadCaptcha();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [resetError, setResetError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
@@ -35,6 +66,7 @@ export default function PortalLogin({ portal }) {
         identifier,
         password,
         portal: isStudent ? 'student' : 'staff',
+        ...(!isStudent && captchaRequired && captcha ? { captcha_id: captcha.id, captcha_answer: captchaAnswer.trim() } : {}),
       });
       const { accessToken, refreshToken, actor } = response.data;
       setSession({ user: { ...actor, portal }, accessToken, refreshToken });
@@ -46,6 +78,7 @@ export default function PortalLogin({ portal }) {
           ? 'Too many attempts. Please wait a moment.'
           : requestError.response?.data?.error?.message || 'Unable to sign in.',
       );
+      if (!isStudent) loadCaptcha();
     } finally {
       setLoading(false);
     }
@@ -69,9 +102,6 @@ export default function PortalLogin({ portal }) {
   return (
     <main className="min-h-screen bg-surface">
       <header className="flex min-h-[72px] items-center justify-between bg-brand px-[max(28px,calc((100vw-1180px)/2))]">
-        <Link href="/" className="inline-flex items-center gap-[7px] text-[13px] text-[#e1e8d7] transition hover:text-white">
-          <ArrowLeft size={16} /> Back to portal
-        </Link>
         <PortalBrand compact size="auth" />
       </header>
       <section className="mx-auto grid min-h-[calc(100vh-72px)] max-w-[1050px] grid-cols-[0.8fr_1fr] items-center gap-[75px] px-[28px] py-[55px] [@media(max-width:800px)]:grid-cols-1 [@media(max-width:800px)]:gap-[35px] [@media(max-width:800px)]:py-[58px]">
@@ -88,23 +118,34 @@ export default function PortalLogin({ portal }) {
               ? 'Review your academic attendance and stay ahead of your semester.'
               : 'Run attendance operations with a clear view of your campus data.'}
           </p>
-          <div className="mt-[22px] inline-flex items-center gap-[9px] text-xs text-brand">
-            <KeyRound size={17} />
-            <span>Use your university credentials to continue.</span>
-          </div>
+          {isStudent ? null : (
+            <div className="mt-[22px] inline-flex items-center gap-[9px] text-xs text-brand">
+              <KeyRound size={17} />
+              <span>Use your university credentials to continue.</span>
+            </div>
+          )}
         </div>
         <div className="max-w-[500px] rounded-lg border border-line bg-paper p-[35px] shadow-[var(--shadow)] [@media(max-width:800px)]:p-[25px]">
           <div>
             <span className="block text-[10px] font-bold uppercase tracking-[0.18em] text-[#b9c89a]">
               FUUAST ATTENDANCE
             </span>
-            <h2 className="mt-2 mb-[5px] text-[25px] font-semibold text-brand-dark">Sign in</h2>
+            <h2 className="mt-2 mb-[5px] text-[25px] font-semibold text-brand-dark">
+              {showLookup ? 'Check attendance' : 'Sign in'}
+            </h2>
             <p className="m-0 text-[13px] text-muted">
-              {isStudent
-                ? 'Enter your student ID or registered email.'
-                : 'Enter your staff username, email, or login ID.'}
+              {showLookup
+                ? 'Seat number + captcha — no password needed.'
+                : isStudent
+                  ? 'Enter your student ID or registered email.'
+                  : 'Enter your staff username, email, or login ID.'}
             </p>
           </div>
+          {showLookup ? (
+            <div className="mt-[27px]">
+              <StudentLookupForm mode="login" />
+            </div>
+          ) : (
           <form onSubmit={submit} className="mt-[27px] grid gap-[17px]">
             <label className="grid gap-2 text-xs font-semibold text-brand-dark">
               Identifier
@@ -138,6 +179,50 @@ export default function PortalLogin({ portal }) {
               </span>
             </label>
             {error ? <p className={formError}>{error}</p> : null}
+            {!isStudent && captchaRequired ? (
+              <div className="grid gap-2">
+                <span className="text-xs font-semibold text-brand-dark">
+                  Captcha — solve: {captcha?.question || '…'}
+                </span>
+                <div className="flex items-center gap-3">
+                  {captcha ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={`data:image/svg+xml;utf8,${encodeURIComponent(captcha.svg)}`}
+                      alt={`Captcha: ${captcha.question}`}
+                      className="h-[54px] w-[150px] rounded border border-line"
+                    />
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={loadCaptcha}
+                      className="text-xs font-semibold text-action hover:underline"
+                    >
+                      Loading… tap to retry
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setCaptcha(null);
+                      loadCaptcha();
+                    }}
+                    title="New captcha"
+                    className="grid h-[34px] w-[34px] place-items-center rounded-[5px] border border-line bg-paper text-brand transition hover:bg-brand-soft"
+                  >
+                    <RefreshCw size={17} />
+                  </button>
+                </div>
+                <input
+                  className={inputClass}
+                  value={captchaAnswer}
+                  onChange={(event) => setCaptchaAnswer(event.target.value)}
+                  placeholder="Your answer"
+                  inputMode="numeric"
+                  required
+                />
+              </div>
+            ) : null}
             <button
               type="submit"
               className="mt-[3px] inline-flex h-10 w-full items-center justify-center gap-2 rounded-md bg-action text-sm font-semibold text-white transition hover:bg-action-hover disabled:cursor-not-allowed disabled:opacity-50"
@@ -147,12 +232,19 @@ export default function PortalLogin({ portal }) {
               {loading ? 'Signing in...' : 'Sign in'}
             </button>
           </form>
-          {/* <p className="mt-[23px] text-center text-xs text-muted">
-            Need another portal?{' '}
-            <Link href={isStudent ? '/staff/login' : '/student/login'} className="font-semibold text-action">
-              {isStudent ? 'Staff access' : 'Student access'}
-            </Link>
-          </p> */}
+          )}
+          {isStudent && !showLookup ? (
+            <p className="mt-[10px] text-center text-xs text-muted">
+              Just checking attendance?{' '}
+              <button
+                type="button"
+                onClick={() => setAuthMode('lookup')}
+                className="font-semibold text-action"
+              >
+                Back to quick check
+              </button>
+            </p>
+          ) : null}
         </div>
       </section>
       {mustReset ? (

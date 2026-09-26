@@ -5,19 +5,14 @@ import PortalLogin from '@/components/PortalLogin';
 import { applyLoginMode, getDefaultPortal, getRootLoginMode } from '@/lib/AppController';
 
 export default function HomePage() {
-  const [mounted, setMounted] = useState(false);
+  const [portal, setPortal] = useState(null);
 
   useEffect(() => {
-    setMounted(true);
+    const login = getRootLoginMode(getDefaultPortal());
+    setPortal(login.portal);
+    applyLoginMode(login);
   }, []);
 
-  const login = getRootLoginMode(getDefaultPortal());
-
-  useEffect(() => {
-    if (mounted) applyLoginMode(login);
-  }, [login, mounted]);
-
-  if (!mounted) return null;
-
-  return login.mode === 'render' ? <PortalLogin portal={login.portal} /> : null;
+  if (!portal) return null;
+  return <PortalLogin portal={portal} />;
 }

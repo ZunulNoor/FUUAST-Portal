@@ -6,13 +6,16 @@ import {
   BookOpen,
   Building2,
   CalendarCheck,
+  CheckSquare,
   ChevronLeft,
   ChevronRight,
+  ClipboardList,
   LayoutDashboard,
   Layers3,
   Menu,
   Settings,
   Shield,
+  SlidersHorizontal,
   Users,
   GraduationCap,
   User,
@@ -54,6 +57,7 @@ export default function PortalSidebar({ portal = 'student' }) {
   const [collapsed, setCollapsed] = useState(false);
   const [groups, setGroups] = useState({
     operations: true,
+    hr: true,
     administration: true,
     academic: false,
     configuration: false,
@@ -62,7 +66,7 @@ export default function PortalSidebar({ portal = 'student' }) {
   const isAdmin = isAdministrator(user?.role);
   const isSuper = isSuperAdmin(user?.role);
   const visibleStaffLinks =
-    user?.role === 'assistant' || user?.role === 'teacher'
+    user?.role === 'assistant' || user?.role === 'teacher' || user?.role === 'staff'
       ? staffLinks.filter((link) =>
           canAccessStaffResource(
             user.role,
@@ -74,7 +78,10 @@ export default function PortalSidebar({ portal = 'student' }) {
   const staffOperations = [
     ...visibleStaffLinks,
     ...(user?.role === 'teacher'
-      ? [{ label: 'Mark attendance', href: '/staff/mark-attendance', icon: CalendarCheck }]
+      ? [
+          { label: 'Mark attendance', href: '/staff/mark-attendance', icon: CalendarCheck },
+          { label: 'Coordinator', href: '/staff/coordinator', icon: Shield },
+        ]
       : []),
     ...(isAdmin
       ? [
@@ -92,6 +99,18 @@ export default function PortalSidebar({ portal = 'student' }) {
     { label: 'Profile', href: '/staff/profile', icon: User },
   ];
   const staffAdministration = isSuper ? adminLinks : [];
+
+  const hrLinksAll = [
+    { key: 'hr-my-leaves', label: 'My Leaves', href: '/staff/hr/my-leaves', icon: CalendarCheck },
+    { key: 'hr-approvals', label: 'Leave Approvals', href: '/staff/hr/approvals', icon: CheckSquare },
+    { key: 'hr-attendance', label: 'Staff Attendance', href: '/staff/hr/attendance', icon: ClipboardList },
+    { key: 'hr-staff', label: 'Staff Directory', href: '/staff/hr/staff', icon: Users },
+    { key: 'hr-rules', label: 'Leave Rules', href: '/staff/hr/rules', icon: SlidersHorizontal },
+  ];
+  const hrLinks =
+    user?.role === 'assistant'
+      ? hrLinksAll.filter((link) => canAccessStaffResource(user.role, link.key, user.pageAccess))
+      : hrLinksAll.filter((link) => canAccessStaffResource(user?.role, link.key, []));
 
   const navLinkClass = `flex w-full items-center gap-3 rounded-md px-[14px] py-3 text-left text-[13px] text-[#e8ecdf] transition hover:bg-white/15 hover:text-white [&.active]:bg-white/15 [&.active]:text-white ${
     collapsed ? 'md:justify-center md:px-[10px]' : ''
@@ -150,8 +169,8 @@ export default function PortalSidebar({ portal = 'student' }) {
       </button>
       <aside
         data-collapsed={collapsed ? 'true' : 'false'}
-        className={`group peer fixed inset-y-0 left-0 z-40 flex max-h-screen flex-col overflow-y-auto bg-brand text-white [scrollbar-width:none] [&::-webkit-scrollbar]:hidden transition-[width,transform] duration-200 ease-linear max-md:translate-x-[-100%] ${
-          open ? 'max-md:translate-x-0' : ''
+        className={`group peer fixed inset-y-0 left-0 z-40 flex max-h-screen flex-col overflow-y-auto bg-brand text-white [scrollbar-width:none] [&::-webkit-scrollbar]:hidden transition-[width,transform] duration-200 ease-linear ${
+          open ? 'max-md:translate-x-0' : 'max-md:-translate-x-full'
         } ${rootWidth} max-md:py-[18px] py-[24px]`}
       >
         <div
@@ -181,6 +200,7 @@ export default function PortalSidebar({ portal = 'student' }) {
           ) : (
             <>
               {renderGroup('operations', 'Operations', staffOperations)}
+              {renderGroup('hr', 'HR & Leave', hrLinks)}
               {renderGroup('administration', 'Administration', staffAdministration)}
               {renderGroup('academic', 'Academic setup', isSuper ? academicLinks : [])}
             </>

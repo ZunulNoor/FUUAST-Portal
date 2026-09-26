@@ -1,14 +1,5 @@
-'use client';
-
-import { useEffect } from 'react';
-import { applyLoginMode, getLoginMode } from '@/lib/AppController';
+import PortalLogin from '@/components/PortalLogin';
 
 export default function StaffLoginPage() {
-  const login = getLoginMode('staff');
-
-  useEffect(() => {
-    applyLoginMode(login);
-  }, [login]);
-
-  return null;
+  return <PortalLogin portal="staff" />;
 }

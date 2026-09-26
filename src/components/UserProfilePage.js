@@ -14,15 +14,12 @@ import { staffApi, studentApi } from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
 import { useToastStore } from '@/store/toastStore';
 import PortalSidebar from './PortalSidebar';
-import PortalHeaderUser from './PortalHeaderUser';
+import PageHeader from './PageHeader';
 import { inputClass } from '@/components/ui/Field';
 import {
   panel,
   portalMain,
-  portalHeader,
   portalContent,
-  headerTitle,
-  headerSub,
   eyebrow,
   sectionHeading,
   sectionHeadingTitle,
@@ -129,15 +126,15 @@ export default function UserProfilePage({ portal = 'staff' }) {
     <>
       <PortalSidebar portal={portal} />
       <main className={portalMain}>
-        <header className={portalHeader}>
-          <div>
-            <h1 className={headerTitle}>My profile</h1>
-            <p className={headerSub}>Review your details and manage your security settings.</p>
-          </div>
-          <PortalHeaderUser portal={portal} />
-        </header>
+        <PageHeader
+          title="My profile"
+          description={
+            isStudent ? 'Review your details.' : 'Review your details and manage your security settings.'
+          }
+          portal={portal}
+        />
         <div className={portalContent}>
-          <div className="grid items-start gap-6 lg:grid-cols-[1fr_0.9fr]">
+          <div className={`grid items-start gap-6 ${isStudent ? '' : 'lg:grid-cols-[1fr_0.9fr]'}`}>
             <section className={`${panel} p-[25px]`}>
               <div className={sectionHeading}>
                 <div>
@@ -178,6 +175,7 @@ export default function UserProfilePage({ portal = 'staff' }) {
               )}
             </section>
 
+            {isStudent ? null : (
             <section className={`${panel} p-[25px]`}>
               <div className={sectionHeading}>
                 <div>
@@ -262,6 +260,7 @@ export default function UserProfilePage({ portal = 'staff' }) {
                 </div>
               </form>
             </section>
+            )}
           </div>
         </div>
       </main>

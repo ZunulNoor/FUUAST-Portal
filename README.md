@@ -2,10 +2,14 @@
 
 Next.js 14 frontend for the University Attendance Management System. It uses
 Tailwind CSS for styling, Axios for API requests, and Zustand for auth state.
-The frontend talks directly to two independently deployed backend APIs:
+The browser talks same-origin only, to a Next.js proxy
+(`src/app/api/backend/[...path]/route.js`) that forwards server-side to three
+independently deployed backend APIs — real backend hosts/ports never appear in
+the browser's Network tab:
 
-- `NEXT_PUBLIC_API_STUDENT_URL` handles student login and attendance views.
-- `NEXT_PUBLIC_API_STAFF_URL` handles teacher and administration workflows.
+- `STAFF_API_URL` handles teacher and administration workflows.
+- `LEAVE_API_URL` handles staff attendance and leave management.
+- `STUDENT_API_URL` handles student login and attendance views.
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the reason behind the
 two-API deployment.
@@ -31,18 +35,17 @@ src/store/authStore.js Persisted Zustand auth session
 
 ## Environment configuration
 
-There is no committed `.env.example` file. Create `.env.local` in this
-directory:
+Copy `.env.example` to `.env.local` in this directory (values below are the
+local defaults):
 
 ```dotenv
-NEXT_PUBLIC_API_STUDENT_URL=http://localhost:4001/api
-NEXT_PUBLIC_API_STAFF_URL=http://localhost:4002/api
+STAFF_API_URL=http://localhost:4002/api
+LEAVE_API_URL=http://localhost:4003/api
+STUDENT_API_URL=http://localhost:4001/api
 ```
 
-The API module has production URL fallbacks, but setting both values locally
-is recommended so development never accidentally points at production.
-Restart the Next.js dev server after changing `.env.local`; public Next.js
-variables are read during the build/dev process.
+These are server-only variables consumed by the API proxy (never exposed to
+the browser). Restart the Next.js dev server after changing `.env.local`.
 
 ## Local development
 
@@ -92,18 +95,19 @@ fetch call or wiring a new screen.
 ## Deployment on Vercel
 
 1. Import this frontend directory into Vercel.
-2. Set `NEXT_PUBLIC_API_STUDENT_URL` and `NEXT_PUBLIC_API_STAFF_URL` for the
+2. Set `STAFF_API_URL`, `LEAVE_API_URL` and `STUDENT_API_URL` for the
    relevant Vercel environments.
 3. Deploy and verify the landing page, both login flows, and an authenticated
    request from each portal.
-4. Set `CORS_ORIGIN` on both backend APIs to the exact deployed frontend
+4. Set `CORS_ORIGIN` on the backend APIs to the exact deployed frontend
    origin. Do not use `*` when credentials are enabled.
 
 Example production variables:
 
 ```env
-NEXT_PUBLIC_API_STUDENT_URL=https://student.attendance.petzone.pk/api
-NEXT_PUBLIC_API_STAFF_URL=https://staff.petzone.pk/api
+STAFF_API_URL=https://staff.petzone.pk/api
+LEAVE_API_URL=https://leave.petzone.pk/api
+STUDENT_API_URL=https://student.attendance.petzone.pk/api
 ```
 
 The project intentionally uses a system font stack in Tailwind and does not

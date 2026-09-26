@@ -7,17 +7,14 @@ import { staffApi } from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
 import { canAccessStaffResource } from '@/lib/staffAccess';
 import PortalSidebar from './PortalSidebar';
-import PortalHeaderUser from './PortalHeaderUser';
+import PageHeader from './PageHeader';
 import { useConfirm } from '@/components/providers/ConfirmProvider';
 import { useToastStore } from '@/store/toastStore';
 import { inputClass } from '@/components/ui/Field';
 import {
   panel,
   portalMain,
-  portalHeader,
   portalContent,
-  headerTitle,
-  headerSub,
   eyebrow,
   emptyState,
   formError,
@@ -124,13 +121,11 @@ export default function PermissionsPage() {
     <>
       <PortalSidebar portal="staff" />
       <main className={portalMain}>
-        <header className={portalHeader}>
-          <div>
-            <h1 className={headerTitle}>Staff page access</h1>
-            <p className={headerSub}>Choose which pages each staff account or teacher can open.</p>
-          </div>
-          <PortalHeaderUser portal="staff" />
-        </header>
+        <PageHeader
+          title="Staff page access"
+          description="Choose which pages each staff account or teacher can open."
+          portal="staff"
+        />
         <div className={portalContent}>
           <section className={`${panel} p-[28px]`}>
             <div className="flex items-start justify-between gap-[25px] border-b border-line pb-[22px]">

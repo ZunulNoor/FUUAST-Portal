@@ -10,21 +10,25 @@ export default function ResourceTable({
   rows,
   roleConfig,
   canEdit,
+  canManageCoordinator,
   onView,
   onEdit,
   onDelete,
+  onManageCoordinator,
   page,
   pagination,
   onChangePage,
 }) {
-  const hasActions = Boolean(roleConfig.edit || roleConfig.remove || roleConfig.detail);
+  const hasActions = Boolean(
+    roleConfig.edit || roleConfig.remove || roleConfig.detail || canManageCoordinator,
+  );
   const gridTemplateColumns = `repeat(${columns.length}, minmax(120px, 1fr))${
     hasActions ? ' minmax(76px, auto)' : ''
   }`;
 
   return (
     <>
-      <div className="overflow-hidden rounded-lg border border-line">
+      <div className="overflow-x-auto rounded-lg border border-line">
         <div
           className={`grid items-center gap-3 border-b border-line bg-brand-soft/50 px-4 py-2.5 ${hasActions ? '' : ''}`}
           style={{ gridTemplateColumns }}
@@ -50,13 +54,23 @@ export default function ResourceTable({
               key={row.id || index}
               style={{ gridTemplateColumns }}
             >
-              {columns.map(([key]) => (
+              {columns.map(([key, , render]) => (
                 <span key={key} className="truncate text-sm text-ink">
-                  {row[key] ?? '—'}
+                  {render ? render(row) : row[key] ?? '—'}
                 </span>
               ))}
               {hasActions ? (
                 <span className="flex items-center justify-end gap-1">
+                  {canManageCoordinator ? (
+                    <button
+                      type="button"
+                      onClick={() => onManageCoordinator(row)}
+                      title="Manage coordinator status"
+                      className="rounded-md border border-line px-2.5 py-1.5 text-xs font-semibold text-ink transition hover:bg-surface"
+                    >
+                      Coordinator
+                    </button>
+                  ) : null}
                   {resource === 'students' && roleConfig.detail ? (
                     <button
                       type="button"

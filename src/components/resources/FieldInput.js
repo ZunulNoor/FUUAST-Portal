@@ -125,7 +125,7 @@ export default function FieldInput({
   }
 
   return (
-    <Field label={field.label} className={className}>
+    <Field label={field.label} className={className} hint={field.hint}>
       <input
         className={inputClass}
         type={field.type || 'text'}

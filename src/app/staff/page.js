@@ -16,13 +16,11 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useAuthStore } from '@/store/authStore';
 import PortalSidebar from '@/components/PortalSidebar';
-import PortalHeaderUser from '@/components/PortalHeaderUser';
+import PageHeader from '@/components/PageHeader';
 import { canAccessStaffResource, isSuperAdmin } from '@/lib/staffAccess';
 import {
   portalMain,
-  portalHeader,
   portalContent,
-  headerTitle,
   eyebrow,
   btnPrimary,
   btnSecondary,
@@ -115,13 +113,11 @@ export default function StaffDashboard() {
     <>
       <PortalSidebar portal="staff" />
       <main className={`${portalMain} pb-[55px]`}>
-        <header className={portalHeader}>
-          <div>
-            <span className={eyebrow}>STAFF DASHBOARD</span>
-            <h1 className={headerTitle}>Welcome, {user.name || 'Staff'}</h1>
-          </div>
-          <PortalHeaderUser portal="staff" />
-        </header>
+        <PageHeader
+          eyebrowText="STAFF DASHBOARD"
+          title={`Welcome, ${user.name || 'Staff'}`}
+          portal="staff"
+        />
         <div className={portalContent}>
           <section className="flex items-center justify-between gap-[30px] rounded-lg border border-line bg-gradient-to-br from-paper to-[#f0f3e9] p-[25px] max-md:flex-col max-md:items-start">
             <div>

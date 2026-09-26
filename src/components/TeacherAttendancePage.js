@@ -1,23 +1,21 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import Link from 'next/link';
 import { RefreshCw, Save } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { staffApi } from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
 import { useToastStore } from '@/store/toastStore';
 import PortalSidebar from './PortalSidebar';
-import PortalHeaderUser from './PortalHeaderUser';
+import PageHeader from './PageHeader';
 import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
 import { inputClass } from '@/components/ui/Field';
 import {
   panel,
   portalMain,
-  portalHeader,
   portalContent,
-  headerTitle,
-  headerSub,
   eyebrow,
   sectionHeading,
   sectionHeadingTitle,
@@ -359,16 +357,26 @@ export default function TeacherAttendancePage() {
     <>
       <PortalSidebar portal="staff" />
       <main className={portalMain}>
-        <header className={portalHeader}>
-          <div>
-            <h1 className={headerTitle}>Mark attendance</h1>
-            <p className={headerSub}>
-              Pick a subject (and section) from your assigned courses, then mark its roster.
-            </p>
-          </div>
-          <PortalHeaderUser portal="staff" />
-        </header>
+        <PageHeader
+          title="Mark attendance"
+          description="Pick a subject (and section) from your assigned courses, then mark its roster."
+          portal="staff"
+        />
         <div className={portalContent}>
+          <div className="mb-[18px] flex gap-2">
+            <Link
+              href="/staff/mark-attendance?mode=day"
+              className="rounded-md border border-line bg-paper px-4 py-2 text-[13px] font-semibold text-ink transition hover:bg-surface"
+            >
+              My day (3-in-1)
+            </Link>
+            <Link
+              href="/staff/mark-attendance?mode=single"
+              className="rounded-md bg-brand px-4 py-2 text-[13px] font-semibold text-white"
+            >
+              Single class
+            </Link>
+          </div>
           <section className={`${panel} p-[25px]`}>
             <div className={sectionHeading}>
               <div>
