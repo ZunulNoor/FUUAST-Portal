@@ -83,12 +83,12 @@ export default function PortalSidebar({ portal = 'student' }) {
           { label: 'Coordinator', href: '/staff/coordinator', icon: Shield },
         ]
       : []),
-    ...(isAdmin
-      ? [
-          { label: 'Batches', href: '/staff/batches', icon: GraduationCap },
-          { label: 'Subjects', href: '/staff/subjects', icon: BookOpen },
-        ]
-      : []),
+    // ...(isAdmin
+    //   ? [
+    //       { label: 'Batches', href: '/staff/batches', icon: GraduationCap },
+    //       { label: 'Subjects', href: '/staff/subjects', icon: BookOpen },
+    //     ]
+    //   : []),
     ...(user?.role === 'admin' ||
     (user?.role === 'assistant' && canAccessStaffResource(user.role, 'teachers', user.pageAccess))
       ? [{ label: 'Teachers', href: '/staff/teachers', icon: Users }]
@@ -200,7 +200,7 @@ export default function PortalSidebar({ portal = 'student' }) {
           ) : (
             <>
               {renderGroup('operations', 'Operations', staffOperations)}
-              {renderGroup('hr', 'HR & Leave', hrLinks)}
+              {/* {renderGroup('hr', 'HR & Leave', hrLinks)} */}
               {renderGroup('administration', 'Administration', staffAdministration)}
               {renderGroup('academic', 'Academic setup', isSuper ? academicLinks : [])}
             </>
