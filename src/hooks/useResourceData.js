@@ -8,6 +8,7 @@ import { canAccessStaffResource } from '@/lib/staffAccess';
 import { getConfig } from '@/configs';
 import { useConfirm } from '@/components/providers/ConfirmProvider';
 import { useToastStore, stashPendingToast } from '@/store/toastStore';
+import { friendlyError } from '@/lib/apiError';
 
 export default function useResourceData(resource) {
   const user = useAuthStore((state) => state.user);
@@ -34,7 +35,7 @@ export default function useResourceData(resource) {
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState(null);
   const [visiblePasswords, setVisiblePasswords] = useState({});
-  const [filters, setFilters] = useState({ department_id: '', semester_id: '' });
+  const [filters, setFilters] = useState({ department_id: '', semester_id: '', shift: '' });
   const [filterDepartments, setFilterDepartments] = useState([]);
   const [filterSemesters, setFilterSemesters] = useState([]);
   const [filterBatches, setFilterBatches] = useState([]);
@@ -58,7 +59,7 @@ export default function useResourceData(resource) {
           exportEndpoint: resource === 'students' ? config.exportEndpoint : null,
           importEndpoint: null,
         }
-      : user?.role === 'admin' && resource === 'subjects'
+      : user?.role === 'admin' && (resource === 'subjects' || resource === 'classes')
         ? {
             ...config,
             fields: config.fields.map((field) =>
@@ -81,41 +82,48 @@ export default function useResourceData(resource) {
     setLoading(true);
     setError('');
     try {
-      const params = roleConfig.searchable
-        ? {
-            search: search || undefined,
-            page,
-            limit: 25,
-            department_id:
-              (resource === 'students' || resource === 'batches' || resource === 'timetable') &&
-              filters.department_id
-                ? filters.department_id
-                : undefined,
-            semester_id:
-              (resource === 'students' || resource === 'timetable') && filters.semester_id
-                ? filters.semester_id
-                : undefined,
-            batch_id: resource === 'students' && filters.batch_id ? filters.batch_id : undefined,
-            class_id: resource === 'students' && filters.class_id ? filters.class_id : undefined,
-          }
-        : resource === 'teachers'
-          ? { search: search || undefined }
-          : resource === 'batches'
-            ? { department_id: filters.department_id || undefined }
-            : resource === 'timetable'
-              ? {
-                  department_id: filters.department_id || undefined,
-                  semester_id: filters.semester_id || undefined,
-                  batch_id: filters.batch_id || undefined,
-                  class_id: filters.class_id || undefined,
-                }
-              : undefined;
+      // Every main list is paged (10/page) except the timetable grid, which
+      // needs the full week at once. Option-fetchers call endpoints directly
+      // without page params and keep receiving full arrays.
+      const params =
+        resource === 'timetable'
+          ? {
+              search: search || undefined,
+              department_id: filters.department_id || undefined,
+              semester_id: filters.semester_id || undefined,
+              batch_id: filters.batch_id || undefined,
+              class_id: filters.class_id || undefined,
+              shift: filters.shift || undefined,
+            }
+          : {
+              page,
+              limit: 10,
+              ...(roleConfig.searchable
+                ? {
+                    search: search || undefined,
+                    department_id:
+                      (resource === 'students' || resource === 'batches') && filters.department_id
+                        ? filters.department_id
+                        : undefined,
+                    semester_id:
+                      resource === 'students' && filters.semester_id
+                        ? filters.semester_id
+                        : undefined,
+                    batch_id:
+                      resource === 'students' && filters.batch_id ? filters.batch_id : undefined,
+                    class_id:
+                      resource === 'students' && filters.class_id ? filters.class_id : undefined,
+                  }
+                : {}),
+              ...(resource === 'teachers' ? { search: search || undefined } : {}),
+              ...(resource === 'batches' ? { department_id: filters.department_id || undefined } : {}),
+            };
       const response = await staffApi.get(roleConfig.endpoint, params ? { params } : undefined);
       const data = response.data?.data || response.data || [];
       setRows(Array.isArray(data) ? data : []);
       setPagination(response.data?.pagination || null);
     } catch (requestError) {
-      setError(requestError.response?.data?.error?.message || 'Unable to load this workspace.');
+      setError(friendlyError(requestError));
     } finally {
       setLoading(false);
     }
@@ -132,7 +140,7 @@ export default function useResourceData(resource) {
       });
       setDetailCourses(response.data?.courses || []);
     } catch (requestError) {
-      setError(requestError.response?.data?.error?.message || 'Unable to load course attendance.');
+      setError(friendlyError(requestError));
     } finally {
       setDetailLoading(false);
     }
@@ -194,8 +202,10 @@ export default function useResourceData(resource) {
     if (user?.role === 'admin' && !base.id && resource === 'subjects') {
       base.department_id = user.departmentId;
     }
-    if (user?.role === 'admin' && resource === 'batches') {
+    if (user?.role === 'admin' && (resource === 'batches' || resource === 'classes')) {
       if (!base.id) base.department_id = user.departmentId;
+    }
+    if (user?.role === 'admin' && resource === 'batches') {
       if (user.departmentId) {
         staffApi
           .get('/departments')
@@ -271,7 +281,7 @@ export default function useResourceData(resource) {
     if (!user) router.push('/staff/login');
     else if (canAccessStaffResource(user.role, resource, user.pageAccess)) load();
     else router.replace('/staff');
-  }, [hydrated, user, router, resource, search, page, filters.department_id, filters.semester_id, filters.batch_id, filters.class_id]);
+  }, [hydrated, user, router, resource, search, page, filters.department_id, filters.semester_id, filters.batch_id, filters.class_id, filters.shift]);
 
   useEffect(() => {
     if (!hydrated || !user) return;
@@ -398,13 +408,39 @@ export default function useResourceData(resource) {
       roleConfig.fields
         .filter((field) => field.optionsEndpoint)
         .map(async (field) => {
-          const response = await staffApi.get(field.optionsEndpoint);
+          const extraParams =
+            typeof field.optionsParams === 'function' ? field.optionsParams(form) : undefined;
+          if (extraParams === null) return [field.name, []];
+          const response = await staffApi.get(field.optionsEndpoint, {
+            params: extraParams,
+          });
           return [field.name, response.data?.data || response.data || []];
         }),
     )
-      .then((entries) =>
-        setFieldOptions((previous) => ({ ...previous, ...Object.fromEntries(entries) })),
-      )
+      .then((entries) => {
+        const next = Object.fromEntries(entries);
+        setFieldOptions((previous) => ({ ...previous, ...next }));
+        // Drop selections that vanished from a dependent dropdown (e.g. a
+        // section from another semester after the course changed).
+        setForm((current) => {
+          if (!current) return current;
+          let patched = current;
+          for (const field of roleConfig.fields) {
+            if (
+              typeof field.optionsParams === 'function' &&
+              current[field.name] &&
+              Array.isArray(next[field.name])
+            ) {
+              const optionValue = field.optionValue || 'id';
+              const stillThere = next[field.name].some(
+                (option) => String(option[optionValue]) === String(current[field.name]),
+              );
+              if (!stillThere) patched = { ...patched, [field.name]: '' };
+            }
+          }
+          return patched;
+        });
+      })
       .catch(() => setError('Unable to load options.'));
   }, [form, resource, user?.role]);
 
@@ -605,7 +641,10 @@ export default function useResourceData(resource) {
         user.role === 'admin' && resource === 'students'
           ? { status: form.status }
           : Object.fromEntries(
-              roleConfig.fields.map((field) => [field.name, form[field.name] || null]),
+              ((form.id && roleConfig.editFields) || roleConfig.fields).map((field) => [
+                field.name,
+                form[field.name] || null,
+              ]),
             );
       const response = form.id
         ? await staffApi.put(`${roleConfig.endpoint}/${form.id}`, payload)
@@ -625,11 +664,7 @@ export default function useResourceData(resource) {
         notifyAndReload('Saved successfully.');
       }
     } catch (requestError) {
-      setError(
-        requestError.response?.data?.error?.message ||
-          requestError.message ||
-          'Unable to save this record.',
-      );
+      setError(friendlyError(requestError, 'Could not save. Check your entries and try again.'));
     }
   };
 
@@ -645,7 +680,7 @@ export default function useResourceData(resource) {
       await staffApi.delete(`${roleConfig.endpoint}/${id}`);
       notifyAndReload('Deleted successfully.');
     } catch (requestError) {
-      setError(requestError.response?.data?.error?.message || 'Unable to delete this record.');
+      setError(friendlyError(requestError));
     }
   };
 
@@ -679,7 +714,7 @@ export default function useResourceData(resource) {
       anchor.remove();
       URL.revokeObjectURL(url);
     } catch (requestError) {
-      setError(requestError.response?.data?.error?.message || 'Unable to download this file.');
+      setError(friendlyError(requestError));
     }
   };
 
@@ -719,13 +754,24 @@ export default function useResourceData(resource) {
         window.location.reload();
       }
     } catch (requestError) {
-      setError(requestError.response?.data?.error?.message || 'Unable to import this file.');
+      setError(friendlyError(requestError));
     }
     event.target.value = '';
   };
 
   const togglePassword = (name) => {
     setVisiblePasswords((prev) => ({ ...prev, [name]: !prev[name] }));
+  };
+
+  // Reset to first page whenever the result set changes, so filter/search
+  // edits never strand the user on an empty deep page.
+  const handleSearch = (value) => {
+    setPage(1);
+    setSearch(value);
+  };
+  const handleFilters = (value) => {
+    setPage(1);
+    setFilters(value);
   };
 
   return {
@@ -746,13 +792,13 @@ export default function useResourceData(resource) {
     setForm,
     fieldOptions,
     search,
-    setSearch,
+    setSearch: handleSearch,
     page,
     setPage,
     pagination,
     visiblePasswords,
     filters,
-    setFilters,
+    setFilters: handleFilters,
     filterDepartments,
     filterSemesters,
     filterBatches,

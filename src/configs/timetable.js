@@ -23,15 +23,22 @@ export default {
       ...searchableOptions(
         '/class-subject-teacher',
         (row) =>
-          `${row.batch_name} | Semester ${row.semester_number} | ${row.subject_name} | ${row.teacher_name || 'No teacher'}`,
+          `${row.batch_name} | Semester ${row.semester_number} | ${row.subject_name} | ${row.teacher_name || 'No teacher'}${row.shift ? ` | ${row.shift === 'morning' ? 'Morning' : 'Evening'}` : ''}`,
       ),
       textField: 'class_subject_teacher_label',
+      // Remember the picked course's batch+semester so the Section list below
+      // narrows to that semester automatically.
+      alsoSet: ['batch_id', 'semester_id'],
     },
     {
       name: 'class_id',
       label: 'Section',
       required: true,
       ...selectOptions('/classes', (row) => `${row.class_code} - ${row.section_name}`),
+      optionsParams: (form) =>
+        form.batch_id && form.semester_id
+          ? { batch_id: form.batch_id, semester_id: form.semester_id }
+          : null,
     },
     {
       name: 'teacher_id',
@@ -59,4 +66,6 @@ export default {
   editRoles: ['admin', 'super_admin'],
   remove: true,
   removeRoles: ['admin', 'super_admin'],
+  searchable: true,
+  searchPlaceholder: 'Search timetable by batch, section, subject, teacher, room, or day',
 };

@@ -13,6 +13,7 @@ import EmptyState from '@/components/ui/EmptyState';
 import {
   panel, eyebrow, sectionHeading, sectionHeadingTitle, emptyState, formError, statusBadge, btnSecondary,
 } from '@/components/ui/cx';
+import { friendlyError } from '@/lib/apiError';
 
 const currentYear = new Date().getFullYear();
 
@@ -66,7 +67,7 @@ export default function HrMyLeaves() {
         setAttendance([]);
       }
     } catch (requestError) {
-      setError(requestError.response?.data?.error?.message || 'Unable to load leave workspace.');
+      setError(friendlyError(requestError));
     } finally {
       setLoading(false);
     }
@@ -89,7 +90,7 @@ export default function HrMyLeaves() {
       setForm({ leave_type_id: '', from_date: '', to_date: '', reason: '', is_emergency: false, medical_cert: false });
       load();
     } catch (requestError) {
-      setFormErrorMsg(requestError.response?.data?.error?.message || 'Unable to submit request.');
+      setFormErrorMsg(friendlyError(requestError));
     } finally {
       setSaving(false);
     }
@@ -102,7 +103,7 @@ export default function HrMyLeaves() {
       toast('Leave request cancelled.');
       load();
     } catch (requestError) {
-      toast(requestError.response?.data?.error?.message || 'Unable to cancel request.');
+      toast(friendlyError(requestError));
     }
   };
 

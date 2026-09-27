@@ -80,7 +80,9 @@ export default function PortalSidebar({ portal = 'student' }) {
     ...(user?.role === 'teacher'
       ? [
           { label: 'Mark attendance', href: '/staff/mark-attendance', icon: CalendarCheck },
-          { label: 'Coordinator', href: '/staff/coordinator', icon: Shield },
+          ...(user?.isCoordinator
+            ? [{ label: 'Coordinator', href: '/staff/coordinator', icon: Shield }]
+            : []),
         ]
       : []),
     // ...(isAdmin
@@ -90,7 +92,8 @@ export default function PortalSidebar({ portal = 'student' }) {
     //     ]
     //   : []),
     ...(user?.role === 'admin' ||
-    (user?.role === 'assistant' && canAccessStaffResource(user.role, 'teachers', user.pageAccess))
+    (user?.role === 'assistant' && canAccessStaffResource(user.role, 'teachers', user.pageAccess)) ||
+    (user?.role === 'teacher' && user?.isCoordinator)
       ? [{ label: 'Teachers', href: '/staff/teachers', icon: Users }]
       : []),
     ...(user?.role === 'admin'

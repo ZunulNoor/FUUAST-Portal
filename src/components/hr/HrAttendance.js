@@ -7,10 +7,12 @@ import { useToastStore } from '@/store/toastStore';
 import HrShell, { HR_OFFICE } from './HrShell';
 import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
+import Pagination from '@/components/ui/Pagination';
 import Field, { inputClass } from '@/components/ui/Field';
 import {
   panel, eyebrow, sectionHeading, sectionHeadingTitle, emptyState, formError, statusBadge, btnSecondary, filterInputClass,
 } from '@/components/ui/cx';
+import { friendlyError } from '@/lib/apiError';
 
 const ATT_STATUSES = ['present', 'absent', 'late', 'half_day', 'on_leave', 'holiday', 'weekend'];
 
@@ -30,6 +32,8 @@ export default function HrAttendance() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [filters, setFilters] = useState({ ...monthRange(), person_type: '', status: '', department_id: '' });
+  const [rosterPage, setRosterPage] = useState(1);
+  const [rosterTotal, setRosterTotal] = useState(0);
   const [departments, setDepartments] = useState([]);
   const [uploadOpen, setUploadOpen] = useState(false);
   const [periodLabel, setPeriodLabel] = useState('');
@@ -44,24 +48,28 @@ export default function HrAttendance() {
     setLoading(true);
     setError('');
     try {
-      const params = { ...filters };
+      const params = { ...filters, page: rosterPage, limit: 10 };
       Object.keys(params).forEach((k) => {
         if (!params[k]) delete params[k];
       });
+      params.page = rosterPage;
+      params.limit = 10;
       const [rRes, uRes, dRes] = await Promise.all([
-        leaveApi.get('/hr/attendance/roster', { params: { ...params, limit: 500 } }),
+        leaveApi.get('/hr/attendance/roster', { params }),
         leaveApi.get('/hr/attendance/uploads'),
         leaveApi.get('/hr/departments'),
       ]);
-      setRows(rRes.data || []);
+      const payload = rRes.data || [];
+      setRows(payload.data || payload);
+      setRosterTotal(payload.pagination?.total ?? (payload.data || payload).length);
       setUploads(uRes.data || []);
       setDepartments(dRes.data || []);
     } catch (requestError) {
-      setError(requestError.response?.data?.error?.message || 'Unable to load attendance.');
+      setError(friendlyError(requestError));
     } finally {
       setLoading(false);
     }
-  }, [filters]);
+  }, [filters, rosterPage]);
 
   useEffect(() => {
     load();
@@ -100,7 +108,7 @@ export default function HrAttendance() {
       toast(`Upload complete: ${res.data.ok} recorded, ${res.data.skipped} skipped.`);
       load();
     } catch (requestError) {
-      setUploadError(requestError.response?.data?.error?.message || 'Upload failed.');
+      setUploadError(friendlyError(requestError));
     } finally {
       setUploading(false);
     }
@@ -120,7 +128,7 @@ export default function HrAttendance() {
       setCorrectRow(null);
       load();
     } catch (requestError) {
-      toast(requestError.response?.data?.error?.message || 'Unable to correct.');
+      toast(friendlyError(requestError));
     } finally {
       setCorrecting(false);
     }
@@ -183,18 +191,18 @@ export default function HrAttendance() {
           </button>
         </div>
         <div className="mt-[16px] flex flex-wrap gap-2">
-          <input type="date" className={filterInputClass} value={filters.from} onChange={(e) => setFilters({ ...filters, from: e.target.value })} />
-          <input type="date" className={filterInputClass} value={filters.to} onChange={(e) => setFilters({ ...filters, to: e.target.value })} />
-          <select className={filterInputClass} value={filters.person_type} onChange={(e) => setFilters({ ...filters, person_type: e.target.value })}>
+          <input type="date" className={filterInputClass} value={filters.from} onChange={(e) => { setRosterPage(1); setFilters({ ...filters, from: e.target.value }); }} />
+          <input type="date" className={filterInputClass} value={filters.to} onChange={(e) => { setRosterPage(1); setFilters({ ...filters, to: e.target.value }); }} />
+          <select className={filterInputClass} value={filters.person_type} onChange={(e) => { setRosterPage(1); setFilters({ ...filters, person_type: e.target.value }); }}>
             <option value="">Teachers + Staff</option>
             <option value="teacher">Teachers</option>
             <option value="staff">Staff</option>
           </select>
-          <select className={filterInputClass} value={filters.status} onChange={(e) => setFilters({ ...filters, status: e.target.value })}>
+          <select className={filterInputClass} value={filters.status} onChange={(e) => { setRosterPage(1); setFilters({ ...filters, status: e.target.value }); }}>
             <option value="">All statuses</option>
             {ATT_STATUSES.map((s) => <option key={s} value={s}>{s.replace(/_/g, ' ')}</option>)}
           </select>
-          <select className={filterInputClass} value={filters.department_id} onChange={(e) => setFilters({ ...filters, department_id: e.target.value })}>
+          <select className={filterInputClass} value={filters.department_id} onChange={(e) => { setRosterPage(1); setFilters({ ...filters, department_id: e.target.value }); }}>
             <option value="">All departments</option>
             {departments.map((d) => <option key={d.id} value={d.id}>{d.name}</option>)}
           </select>
@@ -206,6 +214,7 @@ export default function HrAttendance() {
         ) : rows.length === 0 ? (
           <p className={emptyState}>No attendance in this range. Upload a fingerprint report first.</p>
         ) : (
+          <>
           <div className="mt-[14px] overflow-x-auto">
             <table className="w-full min-w-[900px] text-left text-[13px]">
               <thead>
@@ -240,6 +249,8 @@ export default function HrAttendance() {
               </tbody>
             </table>
           </div>
+          <Pagination page={rosterPage} total={rosterTotal} limit={10} onChange={setRosterPage} />
+          </>
         )}
       </section>
 

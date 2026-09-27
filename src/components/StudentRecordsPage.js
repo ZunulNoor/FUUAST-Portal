@@ -252,6 +252,7 @@ export default function StudentRecordsPage() {
                 }`}
               >
                 {semester.semester}
+                {semester.batch_name ? ` (${semester.batch_name})` : ''}
               </button>
             ))}
           </section>

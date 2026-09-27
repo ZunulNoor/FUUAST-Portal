@@ -15,9 +15,9 @@ export default {
   ],
   fields: [
     { name: 'department_id', label: 'Department ID', required: true },
-    { name: 'batch_id', label: 'Batch ID', required: true },
+    { name: 'batch_id', label: 'Batch ID', hint: 'Optional — needed only to enroll immediately.' },
     { name: 'student_id', label: 'Seat Number', required: true },
-    { name: 'enrollment_no', label: 'Enrollment no.', required: true },
+    { name: 'enrollment_no', label: 'Enrollment no.', hint: 'Optional — can be added later.' },
     { name: 'name', label: 'Full name', required: true },
     { name: 'father_name', label: 'Father name' },
     { name: 'admission_year', label: 'Admission Year' },

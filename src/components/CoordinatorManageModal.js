@@ -7,6 +7,7 @@ import Button from '@/components/ui/Button';
 import { inputClass } from '@/components/ui/Field';
 import { staffApi } from '@/lib/api';
 import { useToastStore } from '@/store/toastStore';
+import { friendlyError } from '@/lib/apiError';
 
 export default function CoordinatorManageModal({ teacher, user, onClose, onSaved }) {
   const toast = useToastStore((state) => state.toast);
@@ -39,7 +40,7 @@ export default function CoordinatorManageModal({ teacher, user, onClose, onSaved
         setClasses(classRows);
       } catch (requestError) {
         setError(
-          requestError.response?.data?.error?.message || 'Unable to load coordinator details.',
+          friendlyError(requestError),
         );
       } finally {
         if (active) setLoading(false);
@@ -70,7 +71,7 @@ export default function CoordinatorManageModal({ teacher, user, onClose, onSaved
       toast.success(isCoordinator ? 'Coordinator status saved.' : 'Coordinator status removed.');
       onSaved();
     } catch (requestError) {
-      setError(requestError.response?.data?.error?.message || 'Unable to save coordinator status.');
+      setError(friendlyError(requestError));
       setSaving(false);
     }
   };

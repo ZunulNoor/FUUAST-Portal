@@ -1,4 +1,4 @@
-import { searchableOptions, selectOptions } from './helpers';
+import { searchableOptions, selectOptions, semesterLabel } from './helpers';
 
 export default {
   title: 'Teacher assignments',
@@ -20,7 +20,7 @@ export default {
         (row) =>
           `${row.subject_name} | ${row.batch_name} | Semester ${row.semester_number}${
             row.teacher_name ? ` | ${row.teacher_name}` : ''
-          }`,
+          }${row.shift ? ` | ${row.shift === 'morning' ? 'Morning' : 'Evening'}` : ''}`,
       ),
     },
     {
@@ -33,7 +33,7 @@ export default {
       name: 'semester_id',
       label: 'Semester',
       required: true,
-      ...selectOptions('/semesters', (row) => `Semester ${row.number}`),
+      ...selectOptions('/semesters', semesterLabel),
     },
   ],
   create: false,

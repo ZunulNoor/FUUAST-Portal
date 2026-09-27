@@ -1,6 +1,7 @@
 'use client';
 
 import { inputClass } from '@/components/ui/Field';
+import { semesterLabel } from '@/configs/helpers';
 
 const studentAdmins = (role) => ['super_admin', 'keen_admin', 'admin'].includes(role);
 
@@ -49,6 +50,14 @@ export default function ResourceToolbar({
     setPage(1);
   };
 
+  const changeSemesterShift = (event) => {
+    const [semesterId, shift] = String(event.target.value || '').split(':');
+    setFilters((prev) => ({ ...prev, semester_id: semesterId || '', shift: shift || '' }));
+    setPage(1);
+  };
+  const semesterShiftValue =
+    filters.semester_id || filters.shift ? `${filters.semester_id || ''}:${filters.shift || ''}` : '';
+
   return (
     <div className="mt-5 flex flex-wrap items-center gap-3 border-t border-line pt-4">
       {showDepartment ? (
@@ -67,19 +76,38 @@ export default function ResourceToolbar({
         </select>
       ) : null}
       {showSemester ? (
-        <select
-          className={`${inputClass} w-48`}
-          value={filters.semester_id}
-          onChange={changeFilter('semester_id')}
-          aria-label="Filter by semester"
-        >
-          <option value="">All semesters</option>
-          {filterSemesters.map((semester) => (
-            <option key={semester.id} value={semester.id}>
-              {semester.semester || `Semester ${semester.number}`}
-            </option>
-          ))}
-        </select>
+        isTimetable ? (
+          <select
+            className={`${inputClass} w-56`}
+            value={semesterShiftValue}
+            onChange={changeSemesterShift}
+            aria-label="Filter by semester and shift"
+          >
+            <option value="">All semesters</option>
+            {filterSemesters.map((semester) =>
+              ['morning', 'evening'].map((shift) => (
+                <option key={`${semester.id}:${shift}`} value={`${semester.id}:${shift}`}>
+                  {semesterLabel(semester)} —{' '}
+                  {shift === 'morning' ? 'Morning' : 'Evening'}
+                </option>
+              )),
+            )}
+          </select>
+        ) : (
+          <select
+            className={`${inputClass} w-48`}
+            value={filters.semester_id}
+            onChange={changeFilter('semester_id')}
+            aria-label="Filter by semester"
+          >
+            <option value="">All semesters</option>
+            {filterSemesters.map((semester) => (
+              <option key={semester.id} value={semester.id}>
+                {semesterLabel(semester)}
+              </option>
+            ))}
+          </select>
+        )
       ) : null}
       {showBatch ? (
         <select

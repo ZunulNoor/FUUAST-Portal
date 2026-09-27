@@ -21,3 +21,8 @@ export const creatableOptions = (optionsEndpoint, optionLabel, textField, option
   optionValue,
   textField,
 });
+
+// "Semester 2 (FALL 2026 23 Evening)" — batch names carry the shift, so every
+// semester dropdown across the app disambiguates itself the same way.
+export const semesterLabel = (row) =>
+  row.semester || `Semester ${row.number}${row.batch_name ? ` (${row.batch_name})` : ''}`;

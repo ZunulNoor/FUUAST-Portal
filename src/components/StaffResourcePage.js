@@ -84,7 +84,10 @@ export default function StaffResourcePage({ resource }) {
     !hydrated ||
     !user ||
     !roleConfig ||
-    !canAccessStaffResource(user.role, resource, user.pageAccess)
+    !(
+      canAccessStaffResource(user.role, resource, user.pageAccess) ||
+      (resource === 'teachers' && user.role === 'teacher' && user.isCoordinator)
+    )
   )
     return null;
 
@@ -191,26 +194,31 @@ export default function StaffResourcePage({ resource }) {
               </div>
             ) : null}
             <div className="mt-4">
-              {loading ? (
+              {loading && rows.length === 0 ? (
                 <p className="py-10 text-center text-sm text-muted">Loading workspace...</p>
               ) : resource === 'timetable' && timetableView === 'grid' ? (
                 <TimetableGrid entries={rows} canEdit={canEdit} onEdit={openForm} onDelete={remove} />
               ) : (
-                <ResourceTable
-                  resource={resource}
-                  columns={columns}
-                  rows={rows}
-                  roleConfig={roleConfig}
-                  canEdit={canEdit}
-                  canManageCoordinator={canManageCoordinator}
-                  onView={openDetail}
-                  onEdit={openForm}
-                  onDelete={remove}
-                  onManageCoordinator={setCoordinatorTeacher}
-                  page={page}
-                  pagination={pagination}
-                  onChangePage={setPage}
-                />
+                <>
+                  {loading ? (
+                    <p className="pb-2 text-right text-[11px] font-semibold text-muted">Updating…</p>
+                  ) : null}
+                  <ResourceTable
+                    resource={resource}
+                    columns={columns}
+                    rows={rows}
+                    roleConfig={roleConfig}
+                    canEdit={canEdit}
+                    canManageCoordinator={canManageCoordinator}
+                    onView={openDetail}
+                    onEdit={openForm}
+                    onDelete={remove}
+                    onManageCoordinator={setCoordinatorTeacher}
+                    page={page}
+                    pagination={pagination}
+                    onChangePage={setPage}
+                  />
+                </>
               )}
             </div>
           </section>

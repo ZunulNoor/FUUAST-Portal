@@ -27,6 +27,7 @@ import {
   btnPrimary,
   emptyState,
 } from '@/components/ui/cx';
+import { friendlyError } from '@/lib/apiError';
 
 const roleLabel = (role) =>
   ({
@@ -67,7 +68,7 @@ export default function UserProfilePage({ portal = 'staff' }) {
       .get('/auth/me')
       .then((response) => setProfile(response.data?.profile || null))
       .catch((requestError) =>
-        setProfileError(requestError.response?.data?.error?.message || 'Unable to load profile.'),
+        setProfileError(friendlyError(requestError)),
       );
   }, [hydrated, user, api, portal, router]);
 
@@ -97,7 +98,7 @@ export default function UserProfilePage({ portal = 'staff' }) {
       setError(
         requestError.response?.status === 401
           ? 'Current password is incorrect.'
-          : requestError.response?.data?.error?.message || 'Unable to update password.',
+          : friendlyError(requestError),
       );
     } finally {
       setSaving(false);

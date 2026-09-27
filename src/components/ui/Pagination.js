@@ -6,7 +6,7 @@ export default function Pagination({ page, total, limit, onChange }) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line px-4 py-3">
       <span className="text-xs text-muted">
-        Page {page} of {pages} ({total} students)
+        Page {page} of {pages} ({total} records)
       </span>
       <div className="flex gap-2">
         {[

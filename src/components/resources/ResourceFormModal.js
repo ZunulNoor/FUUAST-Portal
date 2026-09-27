@@ -38,6 +38,8 @@ export default function ResourceFormModal({
   toDateInputValue,
 }) {
   const fieldInputProps = { form, setForm, fieldOptions, visiblePasswords, togglePassword };
+  const visibleFields =
+    form?.id && config.editFields ? config.editFields : config.fields;
 
   return (
     <Modal
@@ -65,7 +67,7 @@ export default function ResourceFormModal({
             />
           ) : (
             <div className="grid min-w-0 grid-cols-1 gap-4 sm:grid-cols-2">
-              {config.fields.map((field) => (
+              {visibleFields.map((field) => (
                 <FieldInput
                   key={field.name}
                   field={field}

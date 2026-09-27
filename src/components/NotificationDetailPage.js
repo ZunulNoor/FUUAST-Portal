@@ -8,6 +8,7 @@ import { useAuthStore } from '@/store/authStore';
 import PortalSidebar from '@/components/PortalSidebar';
 import PageHeader from '@/components/PageHeader';
 import { panel, portalMain, portalContent, btnSecondary, formError } from '@/components/ui/cx';
+import { friendlyError } from '@/lib/apiError';
 
 function formatDate(value) {
   if (!value) return '—';
@@ -59,7 +60,7 @@ export default function NotificationDetailPage({ portal = 'staff' }) {
       })
       .catch((err) => {
         if (!active) return;
-        setError(err.response?.data?.error?.message || 'Unable to load this notification.');
+        setError(friendlyError(err));
         setLoading(false);
       });
     return () => {

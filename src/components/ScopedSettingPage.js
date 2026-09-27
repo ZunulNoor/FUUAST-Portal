@@ -20,6 +20,7 @@ import {
   formError,
   errorTop,
 } from '@/components/ui/cx';
+import { friendlyError } from '@/lib/apiError';
 
 export default function ScopedSettingPage({ setting = 'threshold' }) {
   const user = useAuthStore((state) => state.user);
@@ -71,7 +72,7 @@ export default function ScopedSettingPage({ setting = 'threshold' }) {
           ),
         );
       } catch (requestError) {
-        setError(requestError.response?.data?.error?.message || 'Unable to load setting.');
+        setError(friendlyError(requestError));
       }
     };
     load();
@@ -107,7 +108,7 @@ export default function ScopedSettingPage({ setting = 'threshold' }) {
       await staffApi.put(`/${resource}`, body);
       toast.success('Setting saved successfully.');
     } catch (requestError) {
-      setError(requestError.response?.data?.error?.message || 'Unable to save setting.');
+      setError(friendlyError(requestError));
     }
   };
 

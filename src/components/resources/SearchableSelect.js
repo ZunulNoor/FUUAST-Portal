@@ -29,7 +29,9 @@ export default function SearchableSelect({ field, form, setForm, creatable = fal
   }, [field.optionsEndpoint, open, query]);
 
   const select = (option) => {
-    setForm({ ...form, [field.name]: option[field.optionValue], [field.textField]: undefined });
+    const extra = {};
+    for (const key of field.alsoSet || []) extra[key] = option[key];
+    setForm({ ...form, [field.name]: option[field.optionValue], [field.textField]: undefined, ...extra });
     setQuery(field.optionLabel(option));
     setOpen(false);
   };

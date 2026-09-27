@@ -13,6 +13,7 @@ import { panel, portalMain, portalContent, eyebrow } from '@/components/ui/cx';
 import { staffApi } from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
 import { useToastStore } from '@/store/toastStore';
+import { friendlyError } from '@/lib/apiError';
 
 const STATUS_STYLES = {
   on_track: 'bg-success/10 text-success',
@@ -66,7 +67,7 @@ export default function CoordinatorPage() {
       setSections(response.data?.sections || []);
     } catch (requestError) {
       if (requestError.response?.status === 403) setDenied(true);
-      else setError(requestError.response?.data?.error?.message || 'Unable to load the checklist.');
+      else setError(friendlyError(requestError));
       setSections([]);
     } finally {
       setLoading(false);
@@ -100,7 +101,7 @@ export default function CoordinatorPage() {
         [classId]: {
           loading: false,
           loaded: true,
-          error: requestError.response?.data?.error?.message || 'Unable to load students.',
+          error: friendlyError(requestError),
         },
       }));
     }
@@ -190,7 +191,7 @@ export default function CoordinatorPage() {
       loadStudents(extraClass.class_id);
     } catch (requestError) {
       setExtraError(
-        requestError.response?.data?.error?.message || 'Unable to create the extra class.',
+        friendlyError(requestError),
       );
     } finally {
       setSavingExtra(false);

@@ -11,6 +11,7 @@ import Field, { inputClass } from '@/components/ui/Field';
 import {
   panel, eyebrow, sectionHeading, sectionHeadingTitle, emptyState, formError,
 } from '@/components/ui/cx';
+import { friendlyError } from '@/lib/apiError';
 
 const SETTING_LABELS = {
   shift_start: 'Duty start time (HH:MM)',
@@ -53,7 +54,7 @@ export default function HrRules() {
       setQuotas(res.data?.quotas || []);
       setSettings(res.data?.settings || {});
     } catch (requestError) {
-      setError(requestError.response?.data?.error?.message || 'Unable to load rules.');
+      setError(friendlyError(requestError));
     } finally {
       setLoading(false);
     }
@@ -92,7 +93,7 @@ export default function HrRules() {
       setSettings(res.data?.settings || {});
       toast('Leave rules updated.');
     } catch (requestError) {
-      setSaveError(requestError.response?.data?.error?.message || 'Unable to save rules.');
+      setSaveError(friendlyError(requestError));
     } finally {
       setSaving(false);
     }
@@ -103,7 +104,7 @@ export default function HrRules() {
       const res = await leaveApi.post('/hr/entitlements/open-year', { year: accrueForm.year });
       toast(`Year ${res.data.year} opened for ${res.data.people} people.`);
     } catch (requestError) {
-      toast(requestError.response?.data?.error?.message || 'Unable to open year.');
+      toast(friendlyError(requestError));
     }
   };
 
@@ -113,7 +114,7 @@ export default function HrRules() {
       const res = await leaveApi.post('/hr/entitlements/accrue', { year: accrueForm.year, month: accrueForm.month });
       setAccrueMsg(`Credited earned leave for ${res.data.credited} people (${res.data.year}-${res.data.month}).`);
     } catch (requestError) {
-      setAccrueMsg(requestError.response?.data?.error?.message || 'Unable to accrue.');
+      setAccrueMsg(friendlyError(requestError));
     }
   };
 

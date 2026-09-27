@@ -42,8 +42,8 @@ export default {
   fields: [
     { name: 'name', label: 'Full name *', required: true },
     { name: 'login_id', label: 'User Name *', required: true },
-    { name: 'email', label: 'Email *', required: true },
-    { name: 'phone', label: 'Phone *', required: true },
+    { name: 'email', label: 'Email' },
+    { name: 'phone', label: 'Phone' },
     {
       name: 'employment_type',
       label: 'Employment',

@@ -110,7 +110,7 @@ export default function ResourceTable({
           <EmptyState />
         )}
       </div>
-      <Pagination page={page} total={pagination?.total || 0} limit={pagination?.limit || 25} onChange={onChangePage} />
+      <Pagination page={page} total={pagination?.total || 0} limit={pagination?.limit || 10} onChange={onChangePage} />
     </>
   );
 }

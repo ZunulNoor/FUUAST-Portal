@@ -7,10 +7,12 @@ import { useToastStore } from '@/store/toastStore';
 import HrShell, { HR_OFFICE } from './HrShell';
 import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
+import Pagination from '@/components/ui/Pagination';
 import Field, { inputClass } from '@/components/ui/Field';
 import {
   panel, eyebrow, sectionHeading, sectionHeadingTitle, emptyState, formError, statusBadge, btnSecondary, filterInputClass,
 } from '@/components/ui/cx';
+import { friendlyError } from '@/lib/apiError';
 
 const DESIGNATIONS = [
   { code: 'chairman', name: 'Chairman' },
@@ -33,6 +35,8 @@ export default function HrStaff() {
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
+  const [staffPage, setStaffPage] = useState(1);
+  const [staffTotal, setStaffTotal] = useState(0);
   const [editOpen, setEditOpen] = useState(false);
   const [editing, setEditing] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -45,7 +49,7 @@ export default function HrStaff() {
     setLoading(true);
     setError('');
     try {
-      const params = {};
+      const params = { page: staffPage, limit: 10 };
       if (search) params.search = search;
       if (category) params.category = category;
       const [sRes, dRes, aRes] = await Promise.all([
@@ -53,15 +57,17 @@ export default function HrStaff() {
         leaveApi.get('/hr/departments'),
         leaveApi.get('/hr/assignments'),
       ]);
-      setStaff(sRes.data || []);
+      const payload = sRes.data || [];
+      setStaff(payload.data || payload);
+      setStaffTotal(payload.pagination?.total ?? (payload.data || payload).length);
       setDepartments(dRes.data || []);
       setAssignments(aRes.data || []);
     } catch (requestError) {
-      setError(requestError.response?.data?.error?.message || 'Unable to load staff.');
+      setError(friendlyError(requestError));
     } finally {
       setLoading(false);
     }
-  }, [search, category]);
+  }, [search, category, staffPage]);
 
   useEffect(() => {
     load();
@@ -99,7 +105,7 @@ export default function HrStaff() {
       setEditOpen(false);
       load();
     } catch (requestError) {
-      setSaveError(requestError.response?.data?.error?.message || 'Unable to save staff member.');
+      setSaveError(friendlyError(requestError));
     } finally {
       setSaving(false);
     }
@@ -132,7 +138,7 @@ export default function HrStaff() {
       toast(`Imported: ${res.data.insertedCount} new, ${res.data.updatedCount} updated.${names.length ? ` Temp passwords: ${names.map((n) => `${n}=${pwds[n]}`).join(', ')}` : ''}`);
       load();
     } catch (requestError) {
-      toast(requestError.response?.data?.error?.message || 'Import failed.');
+      toast(friendlyError(requestError));
     } finally {
       setImporting(false);
       if (importRef.current) importRef.current.value = '';
@@ -147,7 +153,7 @@ export default function HrStaff() {
       setAssignOpen(false);
       load();
     } catch (requestError) {
-      toast(requestError.response?.data?.error?.message || 'Unable to save assignment.');
+      toast(friendlyError(requestError));
     }
   };
 
@@ -158,7 +164,7 @@ export default function HrStaff() {
       toast('Assignment removed.');
       load();
     } catch (requestError) {
-      toast(requestError.response?.data?.error?.message || 'Unable to remove assignment.');
+      toast(friendlyError(requestError));
     }
   };
 
@@ -183,8 +189,8 @@ export default function HrStaff() {
           </div>
         </div>
         <div className="mt-[16px] flex flex-wrap gap-2">
-          <input className={filterInputClass} placeholder="Search name / login / email…" value={search} onChange={(e) => setSearch(e.target.value)} />
-          <select className={filterInputClass} value={category} onChange={(e) => setCategory(e.target.value)}>
+          <input className={filterInputClass} placeholder="Search name / login / email…" value={search} onChange={(e) => { setStaffPage(1); setSearch(e.target.value); }} />
+          <select className={filterInputClass} value={category} onChange={(e) => { setStaffPage(1); setCategory(e.target.value); }}>
             <option value="">All categories</option>
             <option value="non_teaching">Non-teaching</option>
             <option value="contract">Contract</option>
@@ -197,6 +203,7 @@ export default function HrStaff() {
         ) : staff.length === 0 ? (
           <p className={emptyState}>No staff members yet.</p>
         ) : (
+          <>
           <div className="mt-[14px] overflow-x-auto">
             <table className="w-full min-w-[860px] text-left text-[13px]">
               <thead>
@@ -229,6 +236,8 @@ export default function HrStaff() {
               </tbody>
             </table>
           </div>
+          <Pagination page={staffPage} total={staffTotal} limit={10} onChange={setStaffPage} />
+          </>
         )}
       </section>
 

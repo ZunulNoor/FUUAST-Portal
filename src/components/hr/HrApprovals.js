@@ -7,11 +7,13 @@ import { useToastStore } from '@/store/toastStore';
 import HrShell, { HR_APPROVER } from './HrShell';
 import Button from '@/components/ui/Button';
 import Modal from '@/components/ui/Modal';
+import Pagination from '@/components/ui/Pagination';
 import Field, { inputClass } from '@/components/ui/Field';
 import {
   panel, eyebrow, sectionHeading, sectionHeadingTitle, emptyState, formError, statusBadge,
   btnSecondary, filterInputClass,
 } from '@/components/ui/cx';
+import { friendlyError } from '@/lib/apiError';
 
 const STEP_LABELS = { chairman: 'Chairman', admin: 'Admin office', dean: 'Dean', registrar: 'Registrar', vice_chancellor: 'Vice Chancellor' };
 
@@ -28,6 +30,10 @@ export default function HrApprovals() {
   const [tab, setTab] = useState('pending');
   const [pending, setPending] = useState([]);
   const [all, setAll] = useState([]);
+  const [pendingPage, setPendingPage] = useState(1);
+  const [pendingTotal, setPendingTotal] = useState(0);
+  const [allPage, setAllPage] = useState(1);
+  const [allTotal, setAllTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
@@ -42,17 +48,21 @@ export default function HrApprovals() {
     setError('');
     try {
       const [pRes, aRes] = await Promise.all([
-        leaveApi.get('/hr/leaves/pending'),
-        leaveApi.get('/hr/leaves/all', { params: { status: statusFilter || undefined, step: stepFilter || undefined } }),
+        leaveApi.get('/hr/leaves/pending', { params: { page: pendingPage, limit: 10 } }),
+        leaveApi.get('/hr/leaves/all', { params: { status: statusFilter || undefined, step: stepFilter || undefined, page: allPage, limit: 10 } }),
       ]);
-      setPending(pRes.data || []);
-      setAll(aRes.data || []);
+      const pPayload = pRes.data || [];
+      setPending(pPayload.data || pPayload);
+      setPendingTotal(pPayload.pagination?.total ?? (pPayload.data || pPayload).length);
+      const aPayload = aRes.data || [];
+      setAll(aPayload.data || aPayload);
+      setAllTotal(aPayload.pagination?.total ?? (aPayload.data || aPayload).length);
     } catch (requestError) {
-      setError(requestError.response?.data?.error?.message || 'Unable to load approvals.');
+      setError(friendlyError(requestError));
     } finally {
       setLoading(false);
     }
-  }, [statusFilter, stepFilter]);
+  }, [statusFilter, stepFilter, pendingPage, allPage]);
 
   useEffect(() => {
     load();
@@ -65,7 +75,7 @@ export default function HrApprovals() {
       setActionComment('');
       setActionError('');
     } catch (requestError) {
-      toast(requestError.response?.data?.error?.message || 'Unable to open request.');
+      toast(friendlyError(requestError));
     }
   };
 
@@ -83,7 +93,7 @@ export default function HrApprovals() {
       setDetail(null);
       load();
     } catch (requestError) {
-      setActionError(requestError.response?.data?.error?.message || 'Unable to act on request.');
+      setActionError(friendlyError(requestError));
     } finally {
       setActing(false);
     }
@@ -152,26 +162,34 @@ export default function HrApprovals() {
         </div>
         <div className="mt-[16px] flex flex-wrap items-center gap-2">
           <Button variant={tab === 'pending' ? 'primary' : 'secondary'} onClick={() => setTab('pending')}>
-            Awaiting me ({pending.length})
+            Awaiting me ({pendingTotal})
           </Button>
           <Button variant={tab === 'all' ? 'primary' : 'secondary'} onClick={() => setTab('all')}>All requests</Button>
           {tab === 'all' ? (
             <>
-              <select className={filterInputClass} value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
+              <select className={filterInputClass} value={statusFilter} onChange={(e) => { setAllPage(1); setStatusFilter(e.target.value); }}>
                 <option value="">All statuses</option>
                 <option value="pending">Pending</option>
                 <option value="approved">Approved</option>
                 <option value="rejected">Rejected</option>
                 <option value="cancelled">Cancelled</option>
               </select>
-              <select className={filterInputClass} value={stepFilter} onChange={(e) => setStepFilter(e.target.value)}>
+              <select className={filterInputClass} value={stepFilter} onChange={(e) => { setAllPage(1); setStepFilter(e.target.value); }}>
                 <option value="">All steps</option>
                 {Object.entries(STEP_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}
               </select>
             </>
           ) : null}
         </div>
-        {loading ? <p className={emptyState}>Loading…</p> : error ? <p className={`${emptyState} text-danger`}>{error}</p> : requestTable(rows, tab === 'all')}
+        {loading && rows.length === 0 ? <p className={emptyState}>Loading…</p> : error ? <p className={`${emptyState} text-danger`}>{error}</p> : requestTable(rows, tab === 'all')}
+        {!loading || rows.length > 0 ? (
+          <Pagination
+            page={tab === 'pending' ? pendingPage : allPage}
+            total={tab === 'pending' ? pendingTotal : allTotal}
+            limit={10}
+            onChange={tab === 'pending' ? setPendingPage : setAllPage}
+          />
+        ) : null}
       </section>
 
       {detail ? (

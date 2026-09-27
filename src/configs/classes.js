@@ -1,4 +1,4 @@
-import { selectOptions } from './helpers';
+import { selectOptions, semesterLabel } from './helpers';
 
 export default {
   title: 'Classes and rooms',
@@ -11,7 +11,7 @@ export default {
     ['section_name', 'Section / details'],
   ],
   fields: [
-    { name: 'department_id', label: 'Department ID' },
+    { name: 'department_id', label: 'Department ID', required: true },
     {
       name: 'batch_id',
       label: 'Batch',
@@ -22,7 +22,7 @@ export default {
       name: 'semester_id',
       label: 'Semester',
       required: true,
-      ...selectOptions('/semesters', (row) => `Semester ${row.number}`),
+      ...selectOptions('/semesters', semesterLabel),
     },
     { name: 'class_code', label: 'Class / room name', required: true },
     { name: 'section_name', label: 'Section / details', required: true },

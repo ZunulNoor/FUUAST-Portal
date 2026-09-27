@@ -20,6 +20,7 @@ import {
   formError,
   errorTop,
 } from '@/components/ui/cx';
+import { friendlyError } from '@/lib/apiError';
 
 export default function PermissionsPage() {
   const user = useAuthStore((state) => state.user);
@@ -56,7 +57,7 @@ export default function PermissionsPage() {
         setStaff(rows);
         if (rows[0]?.selectionKey) setSelectedStaff(rows[0].selectionKey);
       } catch (requestError) {
-        setError(requestError.response?.data?.error?.message || 'Unable to load staff accounts.');
+        setError(friendlyError(requestError));
       } finally {
         setLoading(false);
       }
@@ -77,7 +78,7 @@ export default function PermissionsPage() {
         const response = await staffApi.get(endpoint);
         setAccess(response.data || []);
       } catch (requestError) {
-        setError(requestError.response?.data?.error?.message || 'Unable to load page access.');
+        setError(friendlyError(requestError));
       }
     };
     loadAccess();
@@ -111,7 +112,7 @@ export default function PermissionsPage() {
       );
       toast.success(`${item.label} access updated.`);
     } catch (requestError) {
-      setError(requestError.response?.data?.error?.message || 'Unable to update page access.');
+      setError(friendlyError(requestError));
     } finally {
       setSaving('');
     }

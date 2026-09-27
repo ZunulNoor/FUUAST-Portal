@@ -1,4 +1,4 @@
-import { selectOptions, creatableOptions, searchableOptions } from './helpers';
+import { selectOptions, creatableOptions, searchableOptions, semesterLabel } from './helpers';
 
 export default {
   title: 'Courses',
@@ -25,7 +25,7 @@ export default {
       name: 'semester_id',
       label: 'Semester',
       required: true,
-      ...selectOptions('/semesters', (row) => `Semester ${row.number}`),
+      ...selectOptions('/semesters', semesterLabel),
     },
     {
       name: 'subject_id',
@@ -63,4 +63,8 @@ export default {
   ],
   create: true,
   createRoles: ['admin'],
+  edit: true,
+  editRoles: ['super_admin', 'admin'],
+  searchable: true,
+  searchPlaceholder: 'Search courses by batch, subject, code, or teacher',
 };
