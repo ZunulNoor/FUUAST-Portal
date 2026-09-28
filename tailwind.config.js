@@ -4,7 +4,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-brand: {
+        brand: {
           DEFAULT: '#4A5A2C', // deep olive �?" from the university header
           light: '#7A8F52', // sage �?" lit edge of the header gradient
           dark: '#37451F',

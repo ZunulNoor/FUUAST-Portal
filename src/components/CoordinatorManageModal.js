@@ -39,9 +39,7 @@ export default function CoordinatorManageModal({ teacher, user, onClose, onSaved
         }
         setClasses(classRows);
       } catch (requestError) {
-        setError(
-          friendlyError(requestError),
-        );
+        setError(friendlyError(requestError));
       } finally {
         if (active) setLoading(false);
       }
@@ -54,9 +52,7 @@ export default function CoordinatorManageModal({ teacher, user, onClose, onSaved
 
   const toggleClass = (classId) => {
     setSelected((current) =>
-      current.includes(classId)
-        ? current.filter((id) => id !== classId)
-        : [...current, classId],
+      current.includes(classId) ? current.filter((id) => id !== classId) : [...current, classId],
     );
   };
 

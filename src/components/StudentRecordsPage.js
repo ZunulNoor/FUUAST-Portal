@@ -17,16 +17,13 @@ import { studentApi } from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
 import PortalSidebar from './PortalSidebar';
 import PageHeader from './PageHeader';
-import {
-  panel,
-  portalMain,
-  portalContent,
-  emptyState,
-} from '@/components/ui/cx';
+import { panel, portalMain, portalContent, emptyState } from '@/components/ui/cx';
 
 function standingOf(percentage) {
-  if (percentage >= 75) return { label: 'Good standing', tone: 'bg-white/20 text-white', dot: 'bg-success' };
-  if (percentage >= 50) return { label: 'Needs attention', tone: 'bg-white/20 text-white', dot: 'bg-warning' };
+  if (percentage >= 75)
+    return { label: 'Good standing', tone: 'bg-white/20 text-white', dot: 'bg-success' };
+  if (percentage >= 50)
+    return { label: 'Needs attention', tone: 'bg-white/20 text-white', dot: 'bg-warning' };
   return { label: 'At risk', tone: 'bg-white/20 text-white', dot: 'bg-danger' };
 }
 
@@ -38,7 +35,14 @@ function subjectTone(percentage) {
   return { pill: 'bg-[#fff0f0] text-danger', bar: 'from-danger to-[#f09393]', ring: '#D64545' };
 }
 
-function Ring({ value, size = 120, stroke = 11, track = 'rgba(255,255,255,0.22)', color = '#ffffff', textClass = '' }) {
+function Ring({
+  value,
+  size = 120,
+  stroke = 11,
+  track = 'rgba(255,255,255,0.22)',
+  color = '#ffffff',
+  textClass = '',
+}) {
   const [animated, setAnimated] = useState(false);
   useEffect(() => {
     const frame = requestAnimationFrame(() => requestAnimationFrame(() => setAnimated(true)));
@@ -50,7 +54,14 @@ function Ring({ value, size = 120, stroke = 11, track = 'rgba(255,255,255,0.22)'
   return (
     <div className="relative grid place-items-center" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="-rotate-90">
-        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke={track} strokeWidth={stroke} />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke={track}
+          strokeWidth={stroke}
+        />
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -165,7 +176,9 @@ export default function StudentRecordsPage() {
 
   const chips = [
     profile?.seat_number ? `Seat ${profile.seat_number}` : null,
-    profile?.class_code ? `${profile.class_code}${profile.section_name ? ` · ${profile.section_name}` : ''}` : null,
+    profile?.class_code
+      ? `${profile.class_code}${profile.section_name ? ` · ${profile.section_name}` : ''}`
+      : null,
     profile?.semester ? profile.semester : null,
   ].filter(Boolean);
 
@@ -188,7 +201,9 @@ export default function StudentRecordsPage() {
               <Ring value={overall} size={132} stroke={12} />
               <div className="min-w-[220px] flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${standing.tone}`}>
+                  <span
+                    className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${standing.tone}`}
+                  >
                     <span className={`h-1.5 w-1.5 rounded-full ${standing.dot}`} />
                     {standing.label}
                   </span>
@@ -201,7 +216,10 @@ export default function StudentRecordsPage() {
                 {chips.length ? (
                   <div className="mt-2 flex flex-wrap gap-1.5">
                     {chips.map((chip) => (
-                      <span key={chip} className="rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-semibold">
+                      <span
+                        key={chip}
+                        className="rounded-full bg-white/15 px-2.5 py-1 text-[11px] font-semibold"
+                      >
                         {chip}
                       </span>
                     ))}
@@ -235,7 +253,9 @@ export default function StudentRecordsPage() {
               type="button"
               onClick={() => setSemesterId('')}
               className={`rounded-full px-3.5 py-1.5 text-[13px] font-semibold transition ${
-                !semesterId ? 'bg-brand text-white shadow' : 'border border-line bg-paper text-muted hover:border-brand hover:text-brand'
+                !semesterId
+                  ? 'bg-brand text-white shadow'
+                  : 'border border-line bg-paper text-muted hover:border-brand hover:text-brand'
               }`}
             >
               All
@@ -291,30 +311,46 @@ export default function StudentRecordsPage() {
                             {course.subject_code || ''} · {course.teacher_name || 'Teacher pending'}
                           </span>
                         </div>
-                        <span className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${tone.pill}`}>
+                        <span
+                          className={`shrink-0 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${tone.pill}`}
+                        >
                           {percentage >= 75 ? 'Safe' : percentage >= 50 ? 'Watch' : 'Critical'}
                         </span>
                       </div>
                       <div className="mt-4 flex items-center gap-4">
-                        <Ring value={percentage} size={76} stroke={8} track="#eef1e6" color={tone.ring} textClass="text-brand-dark" />
+                        <Ring
+                          value={percentage}
+                          size={76}
+                          stroke={8}
+                          track="#eef1e6"
+                          color={tone.ring}
+                          textClass="text-brand-dark"
+                        />
                         <div className="grid flex-1 grid-cols-3 gap-2 text-center">
                           <div className="rounded-md bg-[#edf7ef] px-2 py-2">
                             <span className="block text-lg font-bold leading-none text-success">
                               {course.present_classes || 0}
                             </span>
-                            <span className="mt-1 block text-[10px] font-semibold uppercase text-muted">Present</span>
+                            <span className="mt-1 block text-[10px] font-semibold uppercase text-muted">
+                              Present
+                            </span>
                           </div>
                           <div className="rounded-md bg-[#fff5e8] px-2 py-2">
                             <span className="block text-lg font-bold leading-none text-warning">
-                              {(Number(course.late_classes) || 0) + (Number(course.absent_classes) || 0)}
+                              {(Number(course.late_classes) || 0) +
+                                (Number(course.absent_classes) || 0)}
                             </span>
-                            <span className="mt-1 block text-[10px] font-semibold uppercase text-muted">Missed</span>
+                            <span className="mt-1 block text-[10px] font-semibold uppercase text-muted">
+                              Missed
+                            </span>
                           </div>
                           <div className="rounded-md bg-brand-soft px-2 py-2">
                             <span className="block text-lg font-bold leading-none text-brand-dark">
                               {course.total_classes || 0}
                             </span>
-                            <span className="mt-1 block text-[10px] font-semibold uppercase text-muted">Total</span>
+                            <span className="mt-1 block text-[10px] font-semibold uppercase text-muted">
+                              Total
+                            </span>
                           </div>
                         </div>
                       </div>

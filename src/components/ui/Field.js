@@ -5,11 +5,15 @@ export const inputClass =
 
 export default function Field({ label, className = '', children, hint }) {
   return (
-    <label className={`grid min-w-0 content-start gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-brand-dark ${className}`}>
+    <label
+      className={`grid min-w-0 content-start gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-brand-dark ${className}`}
+    >
       {label}
       {children}
       {hint ? (
-        <span className="text-[11px] font-normal normal-case tracking-normal text-muted">{hint}</span>
+        <span className="text-[11px] font-normal normal-case tracking-normal text-muted">
+          {hint}
+        </span>
       ) : null}
     </label>
   );

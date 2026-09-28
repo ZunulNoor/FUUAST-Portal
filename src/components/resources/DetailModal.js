@@ -5,7 +5,12 @@ import EmptyState from '@/components/ui/EmptyState';
 
 export default function DetailModal({ student, courses, loading, onClose }) {
   return (
-    <Modal size="lg" eyebrow="STUDENT COURSES" title={`${student.name} (${student.student_id})`} onClose={onClose}>
+    <Modal
+      size="lg"
+      eyebrow="STUDENT COURSES"
+      title={`${student.name} (${student.student_id})`}
+      onClose={onClose}
+    >
       <div className="min-w-0 overflow-hidden">
         <div className="flex shrink-0 items-center justify-between gap-3 border-b border-line px-5 py-3 sm:px-6">
           <h3 className="text-sm font-bold text-ink">Course-wise attendance</h3>
@@ -28,7 +33,8 @@ export default function DetailModal({ student, courses, loading, onClose }) {
                       {course.subject_name} {course.subject_code ? `(${course.subject_code})` : ''}
                     </strong>
                     <small className="block truncate text-xs text-muted">
-                      {course.class_code} · {course.teacher_name || 'Teacher pending'} · {course.semester}
+                      {course.class_code} · {course.teacher_name || 'Teacher pending'} ·{' '}
+                      {course.semester}
                     </small>
                   </div>
                   <div className="flex shrink-0 flex-col items-end gap-1">

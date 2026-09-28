@@ -56,7 +56,7 @@ export default function ResourceTable({
             >
               {columns.map(([key, , render]) => (
                 <span key={key} className="truncate text-sm text-ink">
-                  {render ? render(row) : row[key] ?? '—'}
+                  {render ? render(row) : (row[key] ?? '—')}
                 </span>
               ))}
               {hasActions ? (
@@ -110,7 +110,12 @@ export default function ResourceTable({
           <EmptyState />
         )}
       </div>
-      <Pagination page={page} total={pagination?.total || 0} limit={pagination?.limit || 10} onChange={onChangePage} />
+      <Pagination
+        page={page}
+        total={pagination?.total || 0}
+        limit={pagination?.limit || 10}
+        onChange={onChangePage}
+      />
     </>
   );
 }

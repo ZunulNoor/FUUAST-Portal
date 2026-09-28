@@ -6,8 +6,18 @@ import { days } from '@/configs/helpers';
 const dayLabel = (day) => day[0].toUpperCase() + day.slice(1);
 
 const fallbackColors = [
-  '#6366f1', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#ec4899',
-  '#8b5cf6', '#14b8a6', '#f97316', '#84cc16', '#06b6d4', '#a855f7',
+  '#6366f1',
+  '#0ea5e9',
+  '#10b981',
+  '#f59e0b',
+  '#ef4444',
+  '#ec4899',
+  '#8b5cf6',
+  '#14b8a6',
+  '#f97316',
+  '#84cc16',
+  '#06b6d4',
+  '#a855f7',
 ];
 
 const toMinutes = (value) => {
@@ -38,16 +48,18 @@ const entryColor = (entry, index) =>
   entry.color || fallbackColors[Number(entry.id || index) % fallbackColors.length];
 
 const assignLayers = (entries) => {
-  const sorted = [...entries].sort(
-    (a, b) => toMinutes(a.start_time) - toMinutes(b.start_time),
-  );
+  const sorted = [...entries].sort((a, b) => toMinutes(a.start_time) - toMinutes(b.start_time));
   const layers = [];
   for (const entry of sorted) {
     const entryStart = toMinutes(entry.start_time);
     const entryEnd = toMinutes(entry.end_time);
     let placed = false;
     for (const layer of layers) {
-      if (layer.every((e) => toMinutes(e.end_time) <= entryStart || toMinutes(e.start_time) >= entryEnd)) {
+      if (
+        layer.every(
+          (e) => toMinutes(e.end_time) <= entryStart || toMinutes(e.start_time) >= entryEnd,
+        )
+      ) {
         layer.push(entry);
         placed = true;
         break;
@@ -105,8 +117,8 @@ export default function TimetableGrid({ entries = [], canEdit = false, onEdit, o
   return (
     <div className="min-w-0">
       <p className="mb-3 text-xs text-muted">
-        {list.length} class{list.length === 1 ? '' : 'es'} · colored by each class&apos;s
-        selected color · {formatTime12(minStart)} to {formatTime12(maxEnd)}
+        {list.length} class{list.length === 1 ? '' : 'es'} · colored by each class&apos;s selected
+        color · {formatTime12(minStart)} to {formatTime12(maxEnd)}
         {canEdit ? ' · hover a class to edit or delete it' : ''}
       </p>
       <div className="overflow-x-auto rounded-lg border border-line">

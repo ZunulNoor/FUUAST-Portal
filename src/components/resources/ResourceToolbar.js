@@ -33,8 +33,7 @@ export default function ResourceToolbar({
       (user?.role === 'teacher' || !filters.batch_id)) ||
     (isTimetable && studentAdmins(user?.role));
   const showBatch =
-    (isStudents && studentAdmins(user?.role)) ||
-    (isTimetable && studentAdmins(user?.role));
+    (isStudents && studentAdmins(user?.role)) || (isTimetable && studentAdmins(user?.role));
   const showSection =
     (isStudents && studentAdmins(user?.role) && Boolean(filters.batch_id)) ||
     (isStudents && user?.role === 'teacher' && filterClasses.length > 0) ||
@@ -56,7 +55,9 @@ export default function ResourceToolbar({
     setPage(1);
   };
   const semesterShiftValue =
-    filters.semester_id || filters.shift ? `${filters.semester_id || ''}:${filters.shift || ''}` : '';
+    filters.semester_id || filters.shift
+      ? `${filters.semester_id || ''}:${filters.shift || ''}`
+      : '';
 
   return (
     <div className="mt-5 flex flex-wrap items-center gap-3 border-t border-line pt-4">
@@ -87,8 +88,7 @@ export default function ResourceToolbar({
             {filterSemesters.map((semester) =>
               ['morning', 'evening'].map((shift) => (
                 <option key={`${semester.id}:${shift}`} value={`${semester.id}:${shift}`}>
-                  {semesterLabel(semester)} —{' '}
-                  {shift === 'morning' ? 'Morning' : 'Evening'}
+                  {semesterLabel(semester)} — {shift === 'morning' ? 'Morning' : 'Evening'}
                 </option>
               )),
             )}

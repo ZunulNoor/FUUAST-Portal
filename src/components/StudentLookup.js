@@ -21,8 +21,8 @@ export default function StudentLookup() {
             Check attendance
           </h1>
           <p className="my-[18px] max-w-[370px] text-base leading-[1.65] text-muted">
-            Enter your seat number and solve the captcha. Each seat number can
-            be viewed once every 10 minutes.
+            Enter your seat number and solve the captcha. Each seat number can be viewed once every
+            10 minutes.
           </p>
           <p className="text-xs text-muted">
             Need full details?{' '}

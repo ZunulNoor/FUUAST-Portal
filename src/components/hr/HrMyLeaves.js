@@ -11,7 +11,14 @@ import Modal from '@/components/ui/Modal';
 import Field, { inputClass } from '@/components/ui/Field';
 import EmptyState from '@/components/ui/EmptyState';
 import {
-  panel, eyebrow, sectionHeading, sectionHeadingTitle, emptyState, formError, statusBadge, btnSecondary,
+  panel,
+  eyebrow,
+  sectionHeading,
+  sectionHeadingTitle,
+  emptyState,
+  formError,
+  statusBadge,
+  btnSecondary,
 } from '@/components/ui/cx';
 import { friendlyError } from '@/lib/apiError';
 
@@ -38,7 +45,14 @@ export default function HrMyLeaves() {
   const [applyOpen, setApplyOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [formErrorMsg, setFormErrorMsg] = useState('');
-  const [form, setForm] = useState({ leave_type_id: '', from_date: '', to_date: '', reason: '', is_emergency: false, medical_cert: false });
+  const [form, setForm] = useState({
+    leave_type_id: '',
+    from_date: '',
+    to_date: '',
+    reason: '',
+    is_emergency: false,
+    medical_cert: false,
+  });
 
   const load = useCallback(async () => {
     if (!personType) {
@@ -77,7 +91,10 @@ export default function HrMyLeaves() {
     load();
   }, [load]);
 
-  const applyDays = useMemo(() => daysBetween(form.from_date, form.to_date), [form.from_date, form.to_date]);
+  const applyDays = useMemo(
+    () => daysBetween(form.from_date, form.to_date),
+    [form.from_date, form.to_date],
+  );
 
   const submitApply = async (event) => {
     event.preventDefault();
@@ -85,9 +102,18 @@ export default function HrMyLeaves() {
     setFormErrorMsg('');
     try {
       const res = await leaveApi.post('/hr/leaves', form);
-      toast(`Leave request submitted (${res.data?.days ?? applyDays} day(s)). Awaiting Chairman recommendation.`);
+      toast(
+        `Leave request submitted (${res.data?.days ?? applyDays} day(s)). Awaiting Chairman recommendation.`,
+      );
       setApplyOpen(false);
-      setForm({ leave_type_id: '', from_date: '', to_date: '', reason: '', is_emergency: false, medical_cert: false });
+      setForm({
+        leave_type_id: '',
+        from_date: '',
+        to_date: '',
+        reason: '',
+        is_emergency: false,
+        medical_cert: false,
+      });
       load();
     } catch (requestError) {
       setFormErrorMsg(friendlyError(requestError));
@@ -108,10 +134,17 @@ export default function HrMyLeaves() {
   };
 
   return (
-    <HrShell title="My Leaves" description="Apply for leave, track approvals and check your yearly balances." allow={HR_SELF}>
+    <HrShell
+      title="My Leaves"
+      description="Apply for leave, track approvals and check your yearly balances."
+      allow={HR_SELF}
+    >
       {!personType ? (
         <section className={`${panel} p-[25px]`}>
-          <EmptyState title="No employee record" message="Sign in as a teacher or staff member to apply for leave." />
+          <EmptyState
+            title="No employee record"
+            message="Sign in as a teacher or staff member to apply for leave."
+          />
         </section>
       ) : (
         <>
@@ -140,14 +173,18 @@ export default function HrMyLeaves() {
             ) : error ? (
               <p className={`${emptyState} text-danger`}>{error}</p>
             ) : balances.length === 0 ? (
-              <p className={emptyState}>No entitlements opened for {currentYear} yet. Contact the Admin office.</p>
+              <p className={emptyState}>
+                No entitlements opened for {currentYear} yet. Contact the Admin office.
+              </p>
             ) : (
               <div className="mt-[18px] grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {balances.map((b) => {
                   const remaining = Number(b.entitled) + Number(b.carried) - Number(b.used);
                   return (
                     <div key={b.id} className="rounded-md border border-line bg-surface p-4">
-                      <p className="text-[11px] font-bold uppercase tracking-wide text-muted">{b.pay_type} pay</p>
+                      <p className="text-[11px] font-bold uppercase tracking-wide text-muted">
+                        {b.pay_type} pay
+                      </p>
                       <p className="mt-1 text-[15px] font-semibold text-brand-dark">{b.name}</p>
                       <p className="mt-2 text-[26px] font-bold text-brand">
                         {remaining} <span className="text-xs font-medium text-muted">left</span>
@@ -192,11 +229,31 @@ export default function HrMyLeaves() {
                         <td className="py-2 pr-3">{String(r.from_date).slice(0, 10)}</td>
                         <td className="py-2 pr-3">{String(r.to_date).slice(0, 10)}</td>
                         <td className="py-2 pr-3">{r.days}</td>
-                        <td className="py-2 pr-3 capitalize">{String(r.current_step).replace(/_/g, ' ')}</td>
-                        <td className="py-2 pr-3"><span className={statusBadge(r.status === 'pending' ? 'late' : r.status === 'approved' ? 'present' : 'absent')}>{r.status}</span></td>
+                        <td className="py-2 pr-3 capitalize">
+                          {String(r.current_step).replace(/_/g, ' ')}
+                        </td>
+                        <td className="py-2 pr-3">
+                          <span
+                            className={statusBadge(
+                              r.status === 'pending'
+                                ? 'late'
+                                : r.status === 'approved'
+                                  ? 'present'
+                                  : 'absent',
+                            )}
+                          >
+                            {r.status}
+                          </span>
+                        </td>
                         <td className="py-2 text-right">
                           {r.status === 'pending' ? (
-                            <button type="button" className={btnSecondary} onClick={() => cancelRequest(r.id)}>Cancel</button>
+                            <button
+                              type="button"
+                              className={btnSecondary}
+                              onClick={() => cancelRequest(r.id)}
+                            >
+                              Cancel
+                            </button>
                           ) : null}
                         </td>
                       </tr>
@@ -232,9 +289,19 @@ export default function HrMyLeaves() {
                     {attendance.map((a) => (
                       <tr key={a.id} className="border-b border-line/60">
                         <td className="py-2 pr-3">{String(a.att_date).slice(0, 10)}</td>
-                        <td className="py-2 pr-3"><span className={statusBadge(a.status === 'on_leave' ? 'late' : a.status)}>{String(a.status).replace(/_/g, ' ')}</span></td>
-                        <td className="py-2 pr-3">{a.check_in ? String(a.check_in).slice(0, 5) : '—'}</td>
-                        <td className="py-2 pr-3">{a.check_out ? String(a.check_out).slice(0, 5) : '—'}</td>
+                        <td className="py-2 pr-3">
+                          <span
+                            className={statusBadge(a.status === 'on_leave' ? 'late' : a.status)}
+                          >
+                            {String(a.status).replace(/_/g, ' ')}
+                          </span>
+                        </td>
+                        <td className="py-2 pr-3">
+                          {a.check_in ? String(a.check_in).slice(0, 5) : '—'}
+                        </td>
+                        <td className="py-2 pr-3">
+                          {a.check_out ? String(a.check_out).slice(0, 5) : '—'}
+                        </td>
                         <td className="py-2 text-muted">{a.note || '—'}</td>
                       </tr>
                     ))}
@@ -247,40 +314,84 @@ export default function HrMyLeaves() {
       )}
 
       {applyOpen ? (
-        <Modal eyebrow="LEAVE APPLICATION" title="Apply for leave" onClose={() => setApplyOpen(false)}>
+        <Modal
+          eyebrow="LEAVE APPLICATION"
+          title="Apply for leave"
+          onClose={() => setApplyOpen(false)}
+        >
           <form onSubmit={submitApply} className="grid gap-4 overflow-y-auto p-6">
             <Field label="Leave type">
-              <select className={inputClass} value={form.leave_type_id} onChange={(e) => setForm({ ...form, leave_type_id: e.target.value })} required>
+              <select
+                className={inputClass}
+                value={form.leave_type_id}
+                onChange={(e) => setForm({ ...form, leave_type_id: e.target.value })}
+                required
+              >
                 <option value="">Select type…</option>
                 {types.map((t) => (
-                  <option key={t.id} value={t.id}>{t.name}</option>
+                  <option key={t.id} value={t.id}>
+                    {t.name}
+                  </option>
                 ))}
               </select>
             </Field>
             <div className="grid grid-cols-2 gap-4">
               <Field label="From date">
-                <input type="date" className={inputClass} value={form.from_date} onChange={(e) => setForm({ ...form, from_date: e.target.value })} required />
+                <input
+                  type="date"
+                  className={inputClass}
+                  value={form.from_date}
+                  onChange={(e) => setForm({ ...form, from_date: e.target.value })}
+                  required
+                />
               </Field>
               <Field label="To date">
-                <input type="date" className={inputClass} value={form.to_date} onChange={(e) => setForm({ ...form, to_date: e.target.value })} required />
+                <input
+                  type="date"
+                  className={inputClass}
+                  value={form.to_date}
+                  onChange={(e) => setForm({ ...form, to_date: e.target.value })}
+                  required
+                />
               </Field>
             </div>
-            {applyDays > 0 ? <p className="text-xs text-muted">Duration: <strong>{applyDays} day(s)</strong> (intervening holidays count as leave).</p> : null}
+            {applyDays > 0 ? (
+              <p className="text-xs text-muted">
+                Duration: <strong>{applyDays} day(s)</strong> (intervening holidays count as leave).
+              </p>
+            ) : null}
             <Field label="Reason">
-              <textarea className={`${inputClass} min-h-[90px] py-2`} value={form.reason} onChange={(e) => setForm({ ...form, reason: e.target.value })} placeholder="Brief reason for leave" />
+              <textarea
+                className={`${inputClass} min-h-[90px] py-2`}
+                value={form.reason}
+                onChange={(e) => setForm({ ...form, reason: e.target.value })}
+                placeholder="Brief reason for leave"
+              />
             </Field>
             <label className="flex items-center gap-2 text-[13px] text-ink">
-              <input type="checkbox" checked={form.is_emergency} onChange={(e) => setForm({ ...form, is_emergency: e.target.checked })} />
+              <input
+                type="checkbox"
+                checked={form.is_emergency}
+                onChange={(e) => setForm({ ...form, is_emergency: e.target.checked })}
+              />
               Emergency / sudden leave (Rule 4)
             </label>
             <label className="flex items-center gap-2 text-[13px] text-ink">
-              <input type="checkbox" checked={form.medical_cert} onChange={(e) => setForm({ ...form, medical_cert: e.target.checked })} />
+              <input
+                type="checkbox"
+                checked={form.medical_cert}
+                onChange={(e) => setForm({ ...form, medical_cert: e.target.checked })}
+              />
               Medical certificate attached (required for sick leave)
             </label>
             {formErrorMsg ? <p className={formError}>{formErrorMsg}</p> : null}
             <div className="flex justify-end gap-2">
-              <Button variant="secondary" onClick={() => setApplyOpen(false)}>Close</Button>
-              <Button type="submit" disabled={saving}>{saving ? 'Submitting…' : 'Submit application'}</Button>
+              <Button variant="secondary" onClick={() => setApplyOpen(false)}>
+                Close
+              </Button>
+              <Button type="submit" disabled={saving}>
+                {saving ? 'Submitting…' : 'Submit application'}
+              </Button>
             </div>
           </form>
         </Modal>

@@ -92,7 +92,8 @@ export default function PortalSidebar({ portal = 'student' }) {
     //     ]
     //   : []),
     ...(user?.role === 'admin' ||
-    (user?.role === 'assistant' && canAccessStaffResource(user.role, 'teachers', user.pageAccess)) ||
+    (user?.role === 'assistant' &&
+      canAccessStaffResource(user.role, 'teachers', user.pageAccess)) ||
     (user?.role === 'teacher' && user?.isCoordinator)
       ? [{ label: 'Teachers', href: '/staff/teachers', icon: Users }]
       : []),
@@ -105,8 +106,18 @@ export default function PortalSidebar({ portal = 'student' }) {
 
   const hrLinksAll = [
     { key: 'hr-my-leaves', label: 'My Leaves', href: '/staff/hr/my-leaves', icon: CalendarCheck },
-    { key: 'hr-approvals', label: 'Leave Approvals', href: '/staff/hr/approvals', icon: CheckSquare },
-    { key: 'hr-attendance', label: 'Staff Attendance', href: '/staff/hr/attendance', icon: ClipboardList },
+    {
+      key: 'hr-approvals',
+      label: 'Leave Approvals',
+      href: '/staff/hr/approvals',
+      icon: CheckSquare,
+    },
+    {
+      key: 'hr-attendance',
+      label: 'Staff Attendance',
+      href: '/staff/hr/attendance',
+      icon: ClipboardList,
+    },
     { key: 'hr-staff', label: 'Staff Directory', href: '/staff/hr/staff', icon: Users },
     { key: 'hr-rules', label: 'Leave Rules', href: '/staff/hr/rules', icon: SlidersHorizontal },
   ];

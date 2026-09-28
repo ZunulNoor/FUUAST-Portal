@@ -9,7 +9,12 @@ import HrShell, { HR_RULES, HR_RULES_WRITE } from './HrShell';
 import Button from '@/components/ui/Button';
 import Field, { inputClass } from '@/components/ui/Field';
 import {
-  panel, eyebrow, sectionHeading, sectionHeadingTitle, emptyState, formError,
+  panel,
+  eyebrow,
+  sectionHeading,
+  sectionHeadingTitle,
+  emptyState,
+  formError,
 } from '@/components/ui/cx';
 import { friendlyError } from '@/lib/apiError';
 
@@ -42,7 +47,10 @@ export default function HrRules() {
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState('');
-  const [accrueForm, setAccrueForm] = useState({ year: new Date().getFullYear(), month: new Date().getMonth() + 1 });
+  const [accrueForm, setAccrueForm] = useState({
+    year: new Date().getFullYear(),
+    month: new Date().getMonth() + 1,
+  });
   const [accrueMsg, setAccrueMsg] = useState('');
 
   const load = useCallback(async () => {
@@ -64,14 +72,25 @@ export default function HrRules() {
     load();
   }, [load]);
 
-  const quotaFor = (typeId, category) => quotas.find((q) => Number(q.leave_type_id) === Number(typeId) && q.category === category);
+  const quotaFor = (typeId, category) =>
+    quotas.find((q) => Number(q.leave_type_id) === Number(typeId) && q.category === category);
 
   const setQuota = (typeId, category, field, value) => {
     const existing = quotaFor(typeId, category);
     if (existing) {
       setQuotas(quotas.map((q) => (q === existing ? { ...q, [field]: value } : q)));
     } else {
-      setQuotas([...quotas, { leave_type_id: typeId, category, quota_per_year: '', accrual_per_month: '', carry_forward: 0, [field]: value }]);
+      setQuotas([
+        ...quotas,
+        {
+          leave_type_id: typeId,
+          category,
+          quota_per_year: '',
+          accrual_per_month: '',
+          carry_forward: 0,
+          [field]: value,
+        },
+      ]);
     }
   };
 
@@ -81,10 +100,16 @@ export default function HrRules() {
     try {
       const res = await leaveApi.put('/hr/rules', {
         quotas: quotas.map((q) => ({
-          leave_type_id: q.leave_type_id, category: q.category,
-          quota_per_year: q.quota_per_year === '' || q.quota_per_year == null ? null : Number(q.quota_per_year),
-          accrual_per_month: q.accrual_per_month === '' || q.accrual_per_month == null ? null : Number(q.accrual_per_month),
-          carry_forward: q.carry_forward ? 1 : 0, notes: q.notes || null,
+          leave_type_id: q.leave_type_id,
+          category: q.category,
+          quota_per_year:
+            q.quota_per_year === '' || q.quota_per_year == null ? null : Number(q.quota_per_year),
+          accrual_per_month:
+            q.accrual_per_month === '' || q.accrual_per_month == null
+              ? null
+              : Number(q.accrual_per_month),
+          carry_forward: q.carry_forward ? 1 : 0,
+          notes: q.notes || null,
         })),
         settings,
       });
@@ -111,15 +136,25 @@ export default function HrRules() {
   const accrue = async () => {
     setAccrueMsg('');
     try {
-      const res = await leaveApi.post('/hr/entitlements/accrue', { year: accrueForm.year, month: accrueForm.month });
-      setAccrueMsg(`Credited earned leave for ${res.data.credited} people (${res.data.year}-${res.data.month}).`);
+      const res = await leaveApi.post('/hr/entitlements/accrue', {
+        year: accrueForm.year,
+        month: accrueForm.month,
+      });
+      setAccrueMsg(
+        `Credited earned leave for ${res.data.credited} people (${res.data.year}-${res.data.month}).`,
+      );
     } catch (requestError) {
       setAccrueMsg(friendlyError(requestError));
     }
   };
 
   return (
-    <HrShell title="Leave Rules" description="Leave types, yearly quotas and approval thresholds (FUUAST Leave Rules Ch. III)." allow={HR_RULES} wide>
+    <HrShell
+      title="Leave Rules"
+      description="Leave types, yearly quotas and approval thresholds (FUUAST Leave Rules Ch. III)."
+      allow={HR_RULES}
+      wide
+    >
       <section className={`${panel} p-[25px]`}>
         <div className={sectionHeading}>
           <div>
@@ -127,13 +162,26 @@ export default function HrRules() {
             <h2 className={sectionHeadingTitle}>Quotas by category</h2>
           </div>
           <div className="flex gap-2">
-            <button type="button" onClick={load} title="Refresh" className="grid h-[34px] w-[34px] place-items-center rounded-[5px] border border-line bg-paper text-brand transition hover:bg-brand-soft">
+            <button
+              type="button"
+              onClick={load}
+              title="Refresh"
+              className="grid h-[34px] w-[34px] place-items-center rounded-[5px] border border-line bg-paper text-brand transition hover:bg-brand-soft"
+            >
               <RefreshCw size={17} />
             </button>
-            {canWrite ? <Button onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Save rules'}</Button> : null}
+            {canWrite ? (
+              <Button onClick={save} disabled={saving}>
+                {saving ? 'Saving…' : 'Save rules'}
+              </Button>
+            ) : null}
           </div>
         </div>
-        {!canWrite ? <p className="mt-3 text-[13px] text-muted">Read-only for your role. Only the Deputy Registrar (or Super Admin) can change rules.</p> : null}
+        {!canWrite ? (
+          <p className="mt-3 text-[13px] text-muted">
+            Read-only for your role. Only the Deputy Registrar (or Super Admin) can change rules.
+          </p>
+        ) : null}
         {loading ? (
           <p className={emptyState}>Loading rules…</p>
         ) : error ? (
@@ -155,7 +203,10 @@ export default function HrRules() {
                   <tr key={t.id} className="border-b border-line/60 align-top">
                     <td className="py-2 pr-3">
                       <p className="font-medium text-ink">{t.name}</p>
-                      <p className="text-xs text-muted">{t.pay_type} pay{t.needs_medical_cert ? ' · medical cert' : ''}{t.counts_as_duty ? ' · duty' : ''}</p>
+                      <p className="text-xs text-muted">
+                        {t.pay_type} pay{t.needs_medical_cert ? ' · medical cert' : ''}
+                        {t.counts_as_duty ? ' · duty' : ''}
+                      </p>
                     </td>
                     {['teaching', 'non_teaching', 'contract'].map((cat) => {
                       const q = quotaFor(t.id, cat);
@@ -163,14 +214,22 @@ export default function HrRules() {
                         <td key={cat} className="py-2 pr-3">
                           <div className="flex items-center gap-1">
                             <input
-                              className={`${inputClass} w-[70px]`} placeholder="quota"
-                              disabled={!canWrite} value={q?.quota_per_year ?? ''}
-                              onChange={(e) => setQuota(t.id, cat, 'quota_per_year', e.target.value)}
+                              className={`${inputClass} w-[70px]`}
+                              placeholder="quota"
+                              disabled={!canWrite}
+                              value={q?.quota_per_year ?? ''}
+                              onChange={(e) =>
+                                setQuota(t.id, cat, 'quota_per_year', e.target.value)
+                              }
                             />
                             <input
-                              className={`${inputClass} w-[70px]`} placeholder="/mo"
-                              disabled={!canWrite} value={q?.accrual_per_month ?? ''}
-                              onChange={(e) => setQuota(t.id, cat, 'accrual_per_month', e.target.value)}
+                              className={`${inputClass} w-[70px]`}
+                              placeholder="/mo"
+                              disabled={!canWrite}
+                              value={q?.accrual_per_month ?? ''}
+                              onChange={(e) =>
+                                setQuota(t.id, cat, 'accrual_per_month', e.target.value)
+                              }
                             />
                           </div>
                         </td>
@@ -178,9 +237,18 @@ export default function HrRules() {
                     })}
                     <td className="py-2">
                       <input
-                        type="checkbox" disabled={!canWrite}
-                        checked={Boolean(['teaching', 'non_teaching', 'contract'].some((cat) => quotaFor(t.id, cat)?.carry_forward))}
-                        onChange={(e) => ['teaching', 'non_teaching', 'contract'].forEach((cat) => setQuota(t.id, cat, 'carry_forward', e.target.checked ? 1 : 0))}
+                        type="checkbox"
+                        disabled={!canWrite}
+                        checked={Boolean(
+                          ['teaching', 'non_teaching', 'contract'].some(
+                            (cat) => quotaFor(t.id, cat)?.carry_forward,
+                          ),
+                        )}
+                        onChange={(e) =>
+                          ['teaching', 'non_teaching', 'contract'].forEach((cat) =>
+                            setQuota(t.id, cat, 'carry_forward', e.target.checked ? 1 : 0),
+                          )
+                        }
                       />
                     </td>
                   </tr>
@@ -198,12 +266,21 @@ export default function HrRules() {
             <span className={eyebrow}>THRESHOLDS</span>
             <h2 className={sectionHeadingTitle}>Approval & attendance settings</h2>
           </div>
-          {canWrite ? <Button onClick={save} disabled={saving}>{saving ? 'Saving…' : 'Save rules'}</Button> : null}
+          {canWrite ? (
+            <Button onClick={save} disabled={saving}>
+              {saving ? 'Saving…' : 'Save rules'}
+            </Button>
+          ) : null}
         </div>
         <div className="mt-[16px] grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {Object.entries(SETTING_LABELS).map(([key, label]) => (
             <Field key={key} label={label}>
-              <input className={inputClass} disabled={!canWrite} value={settings[key] ?? ''} onChange={(e) => setSettings({ ...settings, [key]: e.target.value })} />
+              <input
+                className={inputClass}
+                disabled={!canWrite}
+                value={settings[key] ?? ''}
+                onChange={(e) => setSettings({ ...settings, [key]: e.target.value })}
+              />
             </Field>
           ))}
         </div>
@@ -219,12 +296,26 @@ export default function HrRules() {
           </div>
           <div className="mt-[16px] flex flex-wrap items-end gap-3">
             <Field label="Year">
-              <input type="number" className={inputClass} value={accrueForm.year} onChange={(e) => setAccrueForm({ ...accrueForm, year: Number(e.target.value) })} />
+              <input
+                type="number"
+                className={inputClass}
+                value={accrueForm.year}
+                onChange={(e) => setAccrueForm({ ...accrueForm, year: Number(e.target.value) })}
+              />
             </Field>
             <Field label="Month">
-              <input type="number" min="1" max="12" className={inputClass} value={accrueForm.month} onChange={(e) => setAccrueForm({ ...accrueForm, month: Number(e.target.value) })} />
+              <input
+                type="number"
+                min="1"
+                max="12"
+                className={inputClass}
+                value={accrueForm.month}
+                onChange={(e) => setAccrueForm({ ...accrueForm, month: Number(e.target.value) })}
+              />
             </Field>
-            <Button variant="secondary" onClick={openYear}>Open year (casual + carry)</Button>
+            <Button variant="secondary" onClick={openYear}>
+              Open year (casual + carry)
+            </Button>
             <Button onClick={accrue}>Run earned accrual</Button>
           </div>
           {accrueMsg ? <p className="mt-3 text-[13px] text-brand">{accrueMsg}</p> : null}

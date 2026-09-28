@@ -38,8 +38,7 @@ export default function ResourceFormModal({
   toDateInputValue,
 }) {
   const fieldInputProps = { form, setForm, fieldOptions, visiblePasswords, togglePassword };
-  const visibleFields =
-    form?.id && config.editFields ? config.editFields : config.fields;
+  const visibleFields = form?.id && config.editFields ? config.editFields : config.fields;
 
   return (
     <Modal

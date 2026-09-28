@@ -143,7 +143,9 @@ export default function NotificationsBell({ portal = 'staff' }) {
                         <span className="ml-2 inline-block h-1.5 w-1.5 translate-y-[-2px] rounded-full bg-action" />
                       ) : null}
                     </span>
-                    <span className="shrink-0 text-[10px] text-muted">{timeAgo(item.created_at)}</span>
+                    <span className="shrink-0 text-[10px] text-muted">
+                      {timeAgo(item.created_at)}
+                    </span>
                   </div>
                   {item.message ? (
                     <p className="mt-1 text-xs leading-relaxed text-muted">{item.message}</p>

@@ -1,5 +1,4 @@
-export const panel =
-  'rounded-lg border border-line bg-paper shadow-[var(--shadow)]';
+export const panel = 'rounded-lg border border-line bg-paper shadow-[var(--shadow)]';
 
 export const portalMain =
   'min-h-screen bg-surface transition-[margin-left] duration-200 ease-linear max-md:ml-0 md:ml-[252px] md:peer-data-[collapsed=true]:ml-[76px]';
@@ -17,14 +16,11 @@ export const headerTitle = 'text-[23px] font-semibold text-brand-dark';
 
 export const headerSub = 'mt-1 text-[13px] text-muted';
 
-export const headerUser =
-  'inline-flex items-center gap-2 text-[13px] font-semibold text-brand';
+export const headerUser = 'inline-flex items-center gap-2 text-[13px] font-semibold text-brand';
 
-export const eyebrow =
-  'block text-[10px] font-bold uppercase tracking-[0.18em] text-[#b9c89a]';
+export const eyebrow = 'block text-[10px] font-bold uppercase tracking-[0.18em] text-[#b9c89a]';
 
-export const kicker =
-  'mb-4 block text-[11px] font-bold uppercase tracking-[0.18em] text-action';
+export const kicker = 'mb-4 block text-[11px] font-bold uppercase tracking-[0.18em] text-action';
 
 export const sectionHeading =
   'flex flex-wrap items-end justify-between gap-3 border-b border-line pb-[18px]';

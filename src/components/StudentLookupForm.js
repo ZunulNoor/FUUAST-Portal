@@ -126,7 +126,9 @@ export default function StudentLookupForm({ mode = 'view' }) {
         setError('');
       } else if (status === 409 && data.options) {
         setDeptOptions(data.options);
-        setError('This seat number exists in more than one department — please choose yours below.');
+        setError(
+          'This seat number exists in more than one department — please choose yours below.',
+        );
       } else {
         setError(data.message || 'Unable to look up attendance.');
       }
@@ -151,7 +153,9 @@ export default function StudentLookupForm({ mode = 'view' }) {
           {result.overall_percentage}
           <span className="text-lg">%</span>
         </p>
-        <p className="mt-1 text-xs text-muted">Overall across {result.total_classes} marked class(es)</p>
+        <p className="mt-1 text-xs text-muted">
+          Overall across {result.total_classes} marked class(es)
+        </p>
         <div className="mt-5 grid gap-3">
           {(result.subjects || []).map((s) => (
             <div key={s.subject_code} className="rounded-md border border-line p-3">
@@ -160,16 +164,22 @@ export default function StudentLookupForm({ mode = 'view' }) {
                 <span className="font-bold text-brand">{s.percentage}%</span>
               </div>
               <div className="mt-2 h-2 overflow-hidden rounded bg-surface">
-                <div className="h-full rounded bg-brand" style={{ width: `${Math.min(100, s.percentage)}%` }} />
+                <div
+                  className="h-full rounded bg-brand"
+                  style={{ width: `${Math.min(100, s.percentage)}%` }}
+                />
               </div>
               <p className="mt-1 text-[11px] text-muted">
-                {s.subject_code} · Present {s.present} · Late {s.late} · Absent {s.absent} (of {s.total})
+                {s.subject_code} · Present {s.present} · Late {s.late} · Absent {s.absent} (of{' '}
+                {s.total})
               </p>
             </div>
           ))}
         </div>
         <div className="mt-5">
-          <Button variant="secondary" onClick={reset}>Check another seat</Button>
+          <Button variant="secondary" onClick={reset}>
+            Check another seat
+          </Button>
         </div>
       </div>
     );
@@ -188,7 +198,12 @@ export default function StudentLookupForm({ mode = 'view' }) {
       </Field>
       {deptOptions.length > 0 ? (
         <Field label="Department">
-          <select className={inputClass} value={departmentId} onChange={(e) => setDepartmentId(e.target.value)} required>
+          <select
+            className={inputClass}
+            value={departmentId}
+            onChange={(e) => setDepartmentId(e.target.value)}
+            required
+          >
             <option value="">Select department…</option>
             {deptOptions.map((o) => (
               <option key={o.department_id} value={o.department_id}>
@@ -199,7 +214,9 @@ export default function StudentLookupForm({ mode = 'view' }) {
         </Field>
       ) : null}
       <div className="grid gap-2">
-        <span className="text-xs font-semibold text-brand-dark">Captcha — solve: {captcha?.question || '…'}</span>
+        <span className="text-xs font-semibold text-brand-dark">
+          Captcha — solve: {captcha?.question || '…'}
+        </span>
         <div className="flex items-center gap-3">
           {captcha ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -246,7 +263,8 @@ export default function StudentLookupForm({ mode = 'view' }) {
         disabled={submitting || cooldown > 0}
         className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-md bg-action text-sm font-semibold text-white transition hover:bg-action-hover disabled:cursor-not-allowed disabled:opacity-50"
       >
-        <Search size={17} /> {submitting ? 'Checking…' : mode === 'login' ? 'Open my dashboard' : 'View attendance'}
+        <Search size={17} />{' '}
+        {submitting ? 'Checking…' : mode === 'login' ? 'Open my dashboard' : 'View attendance'}
       </button>
     </form>
   );

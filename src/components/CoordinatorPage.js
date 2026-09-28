@@ -90,7 +90,9 @@ export default function CoordinatorPage() {
   const loadStudents = async (classId) => {
     setSectionData((current) => ({ ...current, [classId]: { loading: true } }));
     try {
-      const response = await staffApi.get('/coordinator/students', { params: { class_id: classId } });
+      const response = await staffApi.get('/coordinator/students', {
+        params: { class_id: classId },
+      });
       setSectionData((current) => ({
         ...current,
         [classId]: { loading: false, loaded: true, data: response.data || {} },
@@ -190,9 +192,7 @@ export default function CoordinatorPage() {
       setExpandedClassId(extraClass.class_id);
       loadStudents(extraClass.class_id);
     } catch (requestError) {
-      setExtraError(
-        friendlyError(requestError),
-      );
+      setExtraError(friendlyError(requestError));
     } finally {
       setSavingExtra(false);
     }
@@ -258,7 +258,10 @@ export default function CoordinatorPage() {
                   const expanded = expandedClassId === section.class_id;
                   const detail = sectionData[section.class_id];
                   return (
-                    <div key={section.class_id} className="mb-4 overflow-hidden rounded-lg border border-line">
+                    <div
+                      key={section.class_id}
+                      className="mb-4 overflow-hidden rounded-lg border border-line"
+                    >
                       <button
                         type="button"
                         onClick={() => toggleSection(section)}
@@ -279,10 +282,7 @@ export default function CoordinatorPage() {
                           </span>
                           <span className="mt-1 block text-xs text-muted">
                             {section.student_count} students · day{' '}
-                            {Math.min(
-                              section.semester_elapsed_days,
-                              section.semester_total_days,
-                            )}{' '}
+                            {Math.min(section.semester_elapsed_days, section.semester_total_days)}{' '}
                             of {section.semester_total_days}
                           </span>
                         </span>
@@ -413,7 +413,9 @@ export default function CoordinatorPage() {
                                   <span className="min-w-0 truncate text-sm font-semibold text-ink">
                                     {student.name}
                                   </span>
-                                  <span className="truncate text-sm text-muted">{student.roll_no}</span>
+                                  <span className="truncate text-sm text-muted">
+                                    {student.roll_no}
+                                  </span>
                                   <span className="text-sm text-success">{student.present}</span>
                                   <span className="text-sm text-warning">{student.late}</span>
                                   <span className="text-sm text-danger">{student.absent}</span>
@@ -459,7 +461,9 @@ export default function CoordinatorPage() {
         >
           <div className="min-w-0 overflow-y-auto p-5 sm:px-6">
             {extraError ? (
-              <p className="mb-4 rounded-md bg-red-50 px-3 py-2 text-sm text-danger">{extraError}</p>
+              <p className="mb-4 rounded-md bg-red-50 px-3 py-2 text-sm text-danger">
+                {extraError}
+              </p>
             ) : null}
             <p className="mb-4 text-xs leading-relaxed text-muted">
               This creates an attendance session the assigned teacher can mark on top of their
@@ -486,7 +490,8 @@ export default function CoordinatorPage() {
                       key={offering.class_subject_teacher_id}
                       value={offering.class_subject_teacher_id}
                     >
-                      {offering.subject_name} ({offering.subject_code}) — {offering.teacher_name || 'No teacher'}
+                      {offering.subject_name} ({offering.subject_code}) —{' '}
+                      {offering.teacher_name || 'No teacher'}
                     </option>
                   ))}
                 </select>

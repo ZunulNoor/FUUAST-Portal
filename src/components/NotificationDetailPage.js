@@ -70,7 +70,10 @@ export default function NotificationDetailPage({ portal = 'staff' }) {
 
   if (!hydrated || !user) return null;
 
-  const typeMeta = typeLabels[item?.type] || { label: 'Notification', tone: 'bg-brand-soft text-brand' };
+  const typeMeta = typeLabels[item?.type] || {
+    label: 'Notification',
+    tone: 'bg-brand-soft text-brand',
+  };
 
   return (
     <>
@@ -98,13 +101,17 @@ export default function NotificationDetailPage({ portal = 'staff' }) {
                     <Bell size={20} />
                   </span>
                   <div>
-                    <span className={`w-max rounded-[4px] px-2 py-[5px] text-[10px] font-bold ${typeMeta.tone}`}>
+                    <span
+                      className={`w-max rounded-[4px] px-2 py-[5px] text-[10px] font-bold ${typeMeta.tone}`}
+                    >
                       {typeMeta.label}
                     </span>
                     <h2 className="mt-2 text-lg font-semibold text-brand-dark">{item.title}</h2>
                   </div>
                 </div>
-                <span className="shrink-0 text-[11px] text-muted">{formatDate(item.created_at)}</span>
+                <span className="shrink-0 text-[11px] text-muted">
+                  {formatDate(item.created_at)}
+                </span>
               </header>
               <div className="grid gap-6 p-6 md:grid-cols-[1fr_220px]">
                 <div>
@@ -135,11 +142,15 @@ export default function NotificationDetailPage({ portal = 'staff' }) {
                   </div>
                   <div>
                     <span className="block text-[10px] text-muted">Type</span>
-                    <strong className="mt-0.5 block text-sm capitalize text-ink">{item.type}</strong>
+                    <strong className="mt-0.5 block text-sm capitalize text-ink">
+                      {item.type}
+                    </strong>
                   </div>
                   <div>
                     <span className="block text-[10px] text-muted">Received</span>
-                    <strong className="mt-0.5 block text-sm text-ink">{formatDate(item.created_at)}</strong>
+                    <strong className="mt-0.5 block text-sm text-ink">
+                      {formatDate(item.created_at)}
+                    </strong>
                   </div>
                 </aside>
               </div>

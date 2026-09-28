@@ -12,7 +12,8 @@ const DEFAULT_TTL_MS = 10 * 60 * 1000;
 const LONG_TTL_MS = 30 * 60 * 1000;
 const MAX_ENTRIES = 200;
 
-const LONG_LIVED = /^(\/(departments|semesters|batches|subjects|hr\/rules|hr\/departments|permissions))($|\?|\/)/;
+const LONG_LIVED =
+  /^(\/(departments|semesters|batches|subjects|hr\/rules|hr\/departments|permissions))($|\?|\/)/;
 const NEVER_CACHE = /^(\/auth\/|\/student\/captcha)/;
 
 const store = new Map(); // key -> { data, expires, backend, root }
@@ -40,11 +41,7 @@ function backendOf(config) {
 // Normalized app path, e.g. '/teachers' or '/hr/leaves/pending'.
 function pathOf(config) {
   const full = `${config.baseURL || ''}${config.url || ''}`;
-  return (
-    full
-      .replace(/^https?:\/\/[^/]+/i, '')
-      .replace(/^\/api\/backend/i, '') || '/'
-  );
+  return full.replace(/^https?:\/\/[^/]+/i, '').replace(/^\/api\/backend/i, '') || '/';
 }
 
 function rootOf(path) {

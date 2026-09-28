@@ -66,7 +66,9 @@ export default function PortalLogin({ portal }) {
         identifier,
         password,
         portal: isStudent ? 'student' : 'staff',
-        ...(!isStudent && captchaRequired && captcha ? { captcha_id: captcha.id, captcha_answer: captchaAnswer.trim() } : {}),
+        ...(!isStudent && captchaRequired && captcha
+          ? { captcha_id: captcha.id, captcha_answer: captchaAnswer.trim() }
+          : {}),
       });
       const { accessToken, refreshToken, actor } = response.data;
       setSession({ user: { ...actor, portal }, accessToken, refreshToken });
@@ -146,92 +148,92 @@ export default function PortalLogin({ portal }) {
               <StudentLookupForm mode="login" />
             </div>
           ) : (
-          <form onSubmit={submit} className="mt-[27px] grid gap-[17px]">
-            <label className="grid gap-2 text-xs font-semibold text-brand-dark">
-              Identifier
-              <input
-                className={inputClass}
-                value={identifier}
-                onChange={(event) => setIdentifier(event.target.value)}
-                placeholder={isStudent ? 'Student ID or email' : 'Username, email, or login ID'}
-                required
-              />
-            </label>
-            <label className="grid gap-2 text-xs font-semibold text-brand-dark">
-              Password
-              <span className="relative block">
-                <input
-                  className={`${inputClass} pr-[43px]`}
-                  type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={(event) => setPassword(event.target.value)}
-                  placeholder="Enter password"
-                  required
-                />
-                <button
-                  type="button"
-                  className="absolute right-[10px] top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-[4px] text-muted transition hover:bg-brand-soft hover:text-brand"
-                  onClick={() => setShowPassword((value) => !value)}
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
-                >
-                  {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
-                </button>
-              </span>
-            </label>
-            {error ? <p className={formError}>{error}</p> : null}
-            {!isStudent && captchaRequired ? (
-              <div className="grid gap-2">
-                <span className="text-xs font-semibold text-brand-dark">
-                  Captcha — solve: {captcha?.question || '…'}
-                </span>
-                <div className="flex items-center gap-3">
-                  {captcha ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      src={`data:image/svg+xml;utf8,${encodeURIComponent(captcha.svg)}`}
-                      alt={`Captcha: ${captcha.question}`}
-                      className="h-[54px] w-[150px] rounded border border-line"
-                    />
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={loadCaptcha}
-                      className="text-xs font-semibold text-action hover:underline"
-                    >
-                      Loading… tap to retry
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setCaptcha(null);
-                      loadCaptcha();
-                    }}
-                    title="New captcha"
-                    className="grid h-[34px] w-[34px] place-items-center rounded-[5px] border border-line bg-paper text-brand transition hover:bg-brand-soft"
-                  >
-                    <RefreshCw size={17} />
-                  </button>
-                </div>
+            <form onSubmit={submit} className="mt-[27px] grid gap-[17px]">
+              <label className="grid gap-2 text-xs font-semibold text-brand-dark">
+                Identifier
                 <input
                   className={inputClass}
-                  value={captchaAnswer}
-                  onChange={(event) => setCaptchaAnswer(event.target.value)}
-                  placeholder="Your answer"
-                  inputMode="numeric"
+                  value={identifier}
+                  onChange={(event) => setIdentifier(event.target.value)}
+                  placeholder={isStudent ? 'Student ID or email' : 'Username, email, or login ID'}
                   required
                 />
-              </div>
-            ) : null}
-            <button
-              type="submit"
-              className="mt-[3px] inline-flex h-10 w-full items-center justify-center gap-2 rounded-md bg-action text-sm font-semibold text-white transition hover:bg-action-hover disabled:cursor-not-allowed disabled:opacity-50"
-              disabled={loading}
-            >
-              {loading ? <Loader2 size={17} className="animate-spin" /> : null}
-              {loading ? 'Signing in...' : 'Sign in'}
-            </button>
-          </form>
+              </label>
+              <label className="grid gap-2 text-xs font-semibold text-brand-dark">
+                Password
+                <span className="relative block">
+                  <input
+                    className={`${inputClass} pr-[43px]`}
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(event) => setPassword(event.target.value)}
+                    placeholder="Enter password"
+                    required
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-[10px] top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-[4px] text-muted transition hover:bg-brand-soft hover:text-brand"
+                    onClick={() => setShowPassword((value) => !value)}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+                  </button>
+                </span>
+              </label>
+              {error ? <p className={formError}>{error}</p> : null}
+              {!isStudent && captchaRequired ? (
+                <div className="grid gap-2">
+                  <span className="text-xs font-semibold text-brand-dark">
+                    Captcha — solve: {captcha?.question || '…'}
+                  </span>
+                  <div className="flex items-center gap-3">
+                    {captcha ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={`data:image/svg+xml;utf8,${encodeURIComponent(captcha.svg)}`}
+                        alt={`Captcha: ${captcha.question}`}
+                        className="h-[54px] w-[150px] rounded border border-line"
+                      />
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={loadCaptcha}
+                        className="text-xs font-semibold text-action hover:underline"
+                      >
+                        Loading… tap to retry
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setCaptcha(null);
+                        loadCaptcha();
+                      }}
+                      title="New captcha"
+                      className="grid h-[34px] w-[34px] place-items-center rounded-[5px] border border-line bg-paper text-brand transition hover:bg-brand-soft"
+                    >
+                      <RefreshCw size={17} />
+                    </button>
+                  </div>
+                  <input
+                    className={inputClass}
+                    value={captchaAnswer}
+                    onChange={(event) => setCaptchaAnswer(event.target.value)}
+                    placeholder="Your answer"
+                    inputMode="numeric"
+                    required
+                  />
+                </div>
+              ) : null}
+              <button
+                type="submit"
+                className="mt-[3px] inline-flex h-10 w-full items-center justify-center gap-2 rounded-md bg-action text-sm font-semibold text-white transition hover:bg-action-hover disabled:cursor-not-allowed disabled:opacity-50"
+                disabled={loading}
+              >
+                {loading ? <Loader2 size={17} className="animate-spin" /> : null}
+                {loading ? 'Signing in...' : 'Sign in'}
+              </button>
+            </form>
           )}
           {isStudent && !showLookup ? (
             <p className="mt-[10px] text-center text-xs text-muted">

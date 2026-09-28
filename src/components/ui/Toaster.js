@@ -32,9 +32,7 @@ export default function Toaster() {
           ) : (
             <CheckCircle2 size={18} className="mt-[1px] shrink-0" />
           )}
-          <p className="min-w-0 flex-1 text-[13px] leading-snug text-ink">
-            {toast.message}
-          </p>
+          <p className="min-w-0 flex-1 text-[13px] leading-snug text-ink">{toast.message}</p>
           <button
             type="button"
             onClick={() => dismiss(toast.id)}

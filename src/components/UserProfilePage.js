@@ -1,14 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import {
-  Eye,
-  EyeOff,
-  KeyRound,
-  Loader2,
-  ShieldCheck,
-  UserRound,
-} from 'lucide-react';
+import { Eye, EyeOff, KeyRound, Loader2, ShieldCheck, UserRound } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { staffApi, studentApi } from '@/lib/api';
 import { useAuthStore } from '@/store/authStore';
@@ -37,7 +30,9 @@ const roleLabel = (role) =>
     assistant: 'Assistant',
     teacher: 'Teacher',
     student: 'Student',
-  })[role] || role || '—';
+  })[role] ||
+  role ||
+  '—';
 
 export default function UserProfilePage({ portal = 'staff' }) {
   const isStudent = portal === 'student';
@@ -67,9 +62,7 @@ export default function UserProfilePage({ portal = 'staff' }) {
     api
       .get('/auth/me')
       .then((response) => setProfile(response.data?.profile || null))
-      .catch((requestError) =>
-        setProfileError(friendlyError(requestError)),
-      );
+      .catch((requestError) => setProfileError(friendlyError(requestError)));
   }, [hydrated, user, api, portal, router]);
 
   const changePassword = async (event) => {
@@ -114,8 +107,16 @@ export default function UserProfilePage({ portal = 'staff' }) {
         ['Father Name', profile?.father_name],
         ['Admission Year', profile?.admission_year],
         ['Department', profile?.department_name],
-        ['Section', profile?.class_code ? `${profile.class_code} · ${profile.section_name || ''}` : 'Not assigned'],
-        ['Current Semester', profile?.semester ? `${profile.semester} · ${profile.batch_name || ''}` : '—'],
+        [
+          'Section',
+          profile?.class_code
+            ? `${profile.class_code} · ${profile.section_name || ''}`
+            : 'Not assigned',
+        ],
+        [
+          'Current Semester',
+          profile?.semester ? `${profile.semester} · ${profile.batch_name || ''}` : '—',
+        ],
       ]
     : [
         ['Email', profile?.email],
@@ -130,7 +131,9 @@ export default function UserProfilePage({ portal = 'staff' }) {
         <PageHeader
           title="My profile"
           description={
-            isStudent ? 'Review your details.' : 'Review your details and manage your security settings.'
+            isStudent
+              ? 'Review your details.'
+              : 'Review your details and manage your security settings.'
           }
           portal={portal}
         />
@@ -143,7 +146,9 @@ export default function UserProfilePage({ portal = 'staff' }) {
                   <h2 className={sectionHeadingTitle}>Profile details</h2>
                 </div>
               </div>
-              {profileError ? <p className={`${formError} ${'mt-[18px]'}`}>{profileError}</p> : null}
+              {profileError ? (
+                <p className={`${formError} ${'mt-[18px]'}`}>{profileError}</p>
+              ) : null}
               {profile ? (
                 <div className="pt-[22px]">
                   <div className="flex flex-wrap items-center gap-4 border-b border-line pb-[20px]">
@@ -177,90 +182,90 @@ export default function UserProfilePage({ portal = 'staff' }) {
             </section>
 
             {isStudent ? null : (
-            <section className={`${panel} p-[25px]`}>
-              <div className={sectionHeading}>
-                <div>
-                  <span className={eyebrow}>SECURITY</span>
-                  <h2 className={sectionHeadingTitle}>Change password</h2>
+              <section className={`${panel} p-[25px]`}>
+                <div className={sectionHeading}>
+                  <div>
+                    <span className={eyebrow}>SECURITY</span>
+                    <h2 className={sectionHeadingTitle}>Change password</h2>
+                  </div>
                 </div>
-              </div>
-              <form onSubmit={changePassword} className="grid gap-[17px] pt-[22px]">
-                <label className="grid gap-2 text-xs font-semibold text-brand-dark">
-                  Current password
-                  <span className="relative block">
-                    <input
-                      className={`${inputClass} pr-[43px]`}
-                      type={showCurrent ? 'text' : 'password'}
-                      value={currentPassword}
-                      onChange={(event) => setCurrentPassword(event.target.value)}
-                      placeholder="Enter current password"
-                      required
-                    />
-                    <button
-                      type="button"
-                      className="absolute right-[10px] top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-[4px] text-muted transition hover:bg-brand-soft hover:text-brand"
-                      onClick={() => setShowCurrent((value) => !value)}
-                      aria-label={showCurrent ? 'Hide current password' : 'Show current password'}
-                    >
-                      {showCurrent ? <EyeOff size={17} /> : <Eye size={17} />}
+                <form onSubmit={changePassword} className="grid gap-[17px] pt-[22px]">
+                  <label className="grid gap-2 text-xs font-semibold text-brand-dark">
+                    Current password
+                    <span className="relative block">
+                      <input
+                        className={`${inputClass} pr-[43px]`}
+                        type={showCurrent ? 'text' : 'password'}
+                        value={currentPassword}
+                        onChange={(event) => setCurrentPassword(event.target.value)}
+                        placeholder="Enter current password"
+                        required
+                      />
+                      <button
+                        type="button"
+                        className="absolute right-[10px] top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-[4px] text-muted transition hover:bg-brand-soft hover:text-brand"
+                        onClick={() => setShowCurrent((value) => !value)}
+                        aria-label={showCurrent ? 'Hide current password' : 'Show current password'}
+                      >
+                        {showCurrent ? <EyeOff size={17} /> : <Eye size={17} />}
+                      </button>
+                    </span>
+                  </label>
+                  <label className="grid gap-2 text-xs font-semibold text-brand-dark">
+                    New password
+                    <span className="relative block">
+                      <input
+                        className={`${inputClass} pr-[43px]`}
+                        type={showNew ? 'text' : 'password'}
+                        value={newPassword}
+                        onChange={(event) => setNewPassword(event.target.value)}
+                        placeholder="At least 6 characters"
+                        required
+                      />
+                      <button
+                        type="button"
+                        className="absolute right-[10px] top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-[4px] text-muted transition hover:bg-brand-soft hover:text-brand"
+                        onClick={() => setShowNew((value) => !value)}
+                        aria-label={showNew ? 'Hide new password' : 'Show new password'}
+                      >
+                        {showNew ? <EyeOff size={17} /> : <Eye size={17} />}
+                      </button>
+                    </span>
+                  </label>
+                  <label className="grid gap-2 text-xs font-semibold text-brand-dark">
+                    Confirm new password
+                    <span className="relative block">
+                      <input
+                        className={`${inputClass} pr-[43px]`}
+                        type={showConfirm ? 'text' : 'password'}
+                        value={confirmPassword}
+                        onChange={(event) => setConfirmPassword(event.target.value)}
+                        placeholder="Repeat new password"
+                        required
+                      />
+                      <button
+                        type="button"
+                        className="absolute right-[10px] top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-[4px] text-muted transition hover:bg-brand-soft hover:text-brand"
+                        onClick={() => setShowConfirm((value) => !value)}
+                        aria-label={showConfirm ? 'Hide confirmation' : 'Show confirmation'}
+                      >
+                        {showConfirm ? <EyeOff size={17} /> : <Eye size={17} />}
+                      </button>
+                    </span>
+                  </label>
+                  {error ? <p className={formError}>{error}</p> : null}
+                  <div className="flex flex-wrap items-center justify-between gap-3">
+                    <span className="inline-flex items-center gap-2 text-[11px] text-muted">
+                      <KeyRound size={15} />
+                      Passwords are stored hashed and never shown.
+                    </span>
+                    <button type="submit" className={btnPrimary} disabled={saving}>
+                      {saving ? <Loader2 size={16} className="animate-spin" /> : null}
+                      {saving ? 'Updating...' : 'Update password'}
                     </button>
-                  </span>
-                </label>
-                <label className="grid gap-2 text-xs font-semibold text-brand-dark">
-                  New password
-                  <span className="relative block">
-                    <input
-                      className={`${inputClass} pr-[43px]`}
-                      type={showNew ? 'text' : 'password'}
-                      value={newPassword}
-                      onChange={(event) => setNewPassword(event.target.value)}
-                      placeholder="At least 6 characters"
-                      required
-                    />
-                    <button
-                      type="button"
-                      className="absolute right-[10px] top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-[4px] text-muted transition hover:bg-brand-soft hover:text-brand"
-                      onClick={() => setShowNew((value) => !value)}
-                      aria-label={showNew ? 'Hide new password' : 'Show new password'}
-                    >
-                      {showNew ? <EyeOff size={17} /> : <Eye size={17} />}
-                    </button>
-                  </span>
-                </label>
-                <label className="grid gap-2 text-xs font-semibold text-brand-dark">
-                  Confirm new password
-                  <span className="relative block">
-                    <input
-                      className={`${inputClass} pr-[43px]`}
-                      type={showConfirm ? 'text' : 'password'}
-                      value={confirmPassword}
-                      onChange={(event) => setConfirmPassword(event.target.value)}
-                      placeholder="Repeat new password"
-                      required
-                    />
-                    <button
-                      type="button"
-                      className="absolute right-[10px] top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-[4px] text-muted transition hover:bg-brand-soft hover:text-brand"
-                      onClick={() => setShowConfirm((value) => !value)}
-                      aria-label={showConfirm ? 'Hide confirmation' : 'Show confirmation'}
-                    >
-                      {showConfirm ? <EyeOff size={17} /> : <Eye size={17} />}
-                    </button>
-                  </span>
-                </label>
-                {error ? <p className={formError}>{error}</p> : null}
-                <div className="flex flex-wrap items-center justify-between gap-3">
-                  <span className="inline-flex items-center gap-2 text-[11px] text-muted">
-                    <KeyRound size={15} />
-                    Passwords are stored hashed and never shown.
-                  </span>
-                  <button type="submit" className={btnPrimary} disabled={saving}>
-                    {saving ? <Loader2 size={16} className="animate-spin" /> : null}
-                    {saving ? 'Updating...' : 'Update password'}
-                  </button>
-                </div>
-              </form>
-            </section>
+                  </div>
+                </form>
+              </section>
             )}
           </div>
         </div>

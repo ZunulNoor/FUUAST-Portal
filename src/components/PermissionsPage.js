@@ -165,7 +165,10 @@ export default function PermissionsPage() {
             ) : (
               <div className="mt-6 grid gap-[10px]">
                 {access.map((item) => (
-                  <label className="flex items-center justify-between gap-5 rounded-md border border-line p-[17px]" key={item.key}>
+                  <label
+                    className="flex items-center justify-between gap-5 rounded-md border border-line p-[17px]"
+                    key={item.key}
+                  >
                     <div className="grid gap-[5px]">
                       <strong className="text-[13px] text-brand-dark">{item.label}</strong>
                       <small className="text-[11px] text-muted">{item.description}</small>

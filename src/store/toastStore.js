@@ -12,8 +12,7 @@ export const useToastStore = create((set, get) => ({
   },
   success: (message) => get().toast('success', message),
   error: (message) => get().toast('error', message),
-  dismiss: (id) =>
-    set((state) => ({ toasts: state.toasts.filter((t) => t.id !== id) })),
+  dismiss: (id) => set((state) => ({ toasts: state.toasts.filter((t) => t.id !== id) })),
   clear: () => set({ toasts: [] }),
 }));
 

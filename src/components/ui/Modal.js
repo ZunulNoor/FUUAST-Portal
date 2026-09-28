@@ -35,14 +35,7 @@ export function ModalHeader({ eyebrow, title, onClose }) {
   );
 }
 
-export default function Modal({
-  size = 'md',
-  eyebrow,
-  title,
-  onClose,
-  children,
-  footer,
-}) {
+export default function Modal({ size = 'md', eyebrow, title, onClose, children, footer }) {
   const width = SIZES[size] || SIZES.md;
   return (
     <div
@@ -53,7 +46,9 @@ export default function Modal({
       <div
         className={`relative flex max-h-[100dvh] w-full ${width} flex-col overflow-hidden bg-paper shadow-2xl max-sm:fixed max-sm:inset-0 max-sm:rounded-none sm:max-h-[calc(100vh-2.5rem)] sm:rounded-xl`}
       >
-        {title || onClose ? <ModalHeader eyebrow={eyebrow} title={title} onClose={onClose} /> : null}
+        {title || onClose ? (
+          <ModalHeader eyebrow={eyebrow} title={title} onClose={onClose} />
+        ) : null}
         <div className="grow overflow-hidden min-w-0 max-sm:overflow-y-auto">{children}</div>
         {footer ? (
           <footer className="flex shrink-0 flex-wrap items-center justify-end gap-3 border-t border-line px-5 py-3 sm:px-6">

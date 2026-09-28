@@ -166,6 +166,5 @@ Two Vercel projects are deployed from this repo (one per portal):
 5. Set `CORS_ORIGIN` on the backend APIs to the exact deployed frontend
    origin(s). Do not use `*` when credentials are enabled.
 
-
 The project intentionally uses a system font stack in Tailwind and does not
 require a build-time Google Fonts request.

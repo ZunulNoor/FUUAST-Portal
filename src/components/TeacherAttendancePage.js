@@ -133,8 +133,7 @@ export default function TeacherAttendancePage() {
   const scopedOfferings = useMemo(
     () =>
       offerings.filter(
-        (offering) =>
-          !departmentId || String(offering.department_id) === String(departmentId),
+        (offering) => !departmentId || String(offering.department_id) === String(departmentId),
       ),
     [offerings, departmentId],
   );
@@ -187,17 +186,15 @@ export default function TeacherAttendancePage() {
     () =>
       subjectQuery.trim()
         ? subjects.filter((subject) =>
-            String(subject.subject_name)
-              .toLowerCase()
-              .includes(subjectQuery.trim().toLowerCase()),
+            String(subject.subject_name).toLowerCase().includes(subjectQuery.trim().toLowerCase()),
           )
         : subjects,
     [subjects, subjectQuery],
   );
 
   const selectedSubject = subjects.find((s) => String(s.subject_id) === String(subjectId));
-  const firstSelectedSection = sections.find(
-    (section) => sectionIds.includes(sectionKeyOf(section.classSubjectTeacherId, section.classId)),
+  const firstSelectedSection = sections.find((section) =>
+    sectionIds.includes(sectionKeyOf(section.classSubjectTeacherId, section.classId)),
   );
   const resolvedSemester = mergeEnabled
     ? firstSelectedSection?.semesterId || selectedSubject?.semester_id || ''
@@ -205,9 +202,7 @@ export default function TeacherAttendancePage() {
 
   const rosterEntries = useMemo(
     () =>
-      sectionIds
-        .map((key) => ({ key, entry: rosters[key] }))
-        .filter(({ entry }) => Boolean(entry)),
+      sectionIds.map((key) => ({ key, entry: rosters[key] })).filter(({ entry }) => Boolean(entry)),
     [sectionIds, rosters],
   );
 
@@ -377,8 +372,7 @@ export default function TeacherAttendancePage() {
               sessionId: rosters[key]?.sessionId || null,
               students: rosters[key]?.students || [],
               dirty: Boolean(rosters[key]?.dirty),
-              loadError:
-                friendlyError(sectionError),
+              loadError: friendlyError(sectionError),
             };
           }
         }
@@ -428,18 +422,14 @@ export default function TeacherAttendancePage() {
     setSaving(true);
     setError('');
     try {
-      const records = [
-        { student_id: match.id, status: 'present', remarks: match.remarks || '' },
-      ];
+      const records = [{ student_id: match.id, status: 'present', remarks: match.remarks || '' }];
       if (mergeGroupId && mergedDate) {
         await staffApi.put(`/attendance/sessions/merged/${mergeGroupId}/records`, {
           date: mergedDate,
           records,
         });
         setStudents((current) =>
-          current.map((item) =>
-            item.id === match.id ? { ...item, status: 'present' } : item,
-          ),
+          current.map((item) => (item.id === match.id ? { ...item, status: 'present' } : item)),
         );
       } else if (match.rosterKey && rosters[match.rosterKey]) {
         const entry = rosters[match.rosterKey];
@@ -456,9 +446,7 @@ export default function TeacherAttendancePage() {
       quickTimerRef.current = setTimeout(() => setQuickMarkedName(''), 2500);
       if (quickInputRef.current) quickInputRef.current.focus();
     } catch (requestError) {
-      setError(
-        friendlyError(requestError),
-      );
+      setError(friendlyError(requestError));
     } finally {
       setSaving(false);
     }
@@ -611,10 +599,7 @@ export default function TeacherAttendancePage() {
                 <RefreshCw size={17} />
               </button>
             </div>
-            <form
-              className="mt-[22px] flex flex-wrap items-end gap-[14px]"
-              onSubmit={openRosters}
-            >
+            <form className="mt-[22px] flex flex-wrap items-end gap-[14px]" onSubmit={openRosters}>
               <label className="grid min-w-[160px] flex-1 gap-[7px] text-xs font-semibold text-brand-dark">
                 Department (optional)
                 <select
@@ -823,8 +808,8 @@ export default function TeacherAttendancePage() {
             {!mergeEnabled && totals.classes > 0 ? (
               <p className="mt-[12px] text-xs text-muted">
                 <strong className="text-brand-dark">{totals.classes} class(es)</strong> ·{' '}
-                {totals.studentsTotal} student(s) · {totals.marked} marked — mark each roster,
-                then save everything together.
+                {totals.studentsTotal} student(s) · {totals.marked} marked — mark each roster, then
+                save everything together.
               </p>
             ) : null}
             {error ? <p className={`${formError} ${errorTop}`}>{error}</p> : null}
@@ -905,7 +890,9 @@ export default function TeacherAttendancePage() {
                                 Attend
                               </Button>
                             ) : (
-                              <span className="text-[12px] font-medium text-success">Marked present</span>
+                              <span className="text-[12px] font-medium text-success">
+                                Marked present
+                              </span>
                             )}
                           </div>
                         ))
@@ -922,8 +909,12 @@ export default function TeacherAttendancePage() {
                       key={student.id}
                     >
                       <div className="min-w-0">
-                        <strong className="block truncate text-[13px] text-brand-dark">{student.name}</strong>
-                        <small className="mt-1 block text-[11px] text-muted">{student.student_id}</small>
+                        <strong className="block truncate text-[13px] text-brand-dark">
+                          {student.name}
+                        </strong>
+                        <small className="mt-1 block text-[11px] text-muted">
+                          {student.student_id}
+                        </small>
                       </div>
                       <select
                         className={inputClass}
@@ -931,7 +922,9 @@ export default function TeacherAttendancePage() {
                         onChange={(event) =>
                           setStudents((current) =>
                             current.map((item) =>
-                              item.id === student.id ? { ...item, status: event.target.value } : item,
+                              item.id === student.id
+                                ? { ...item, status: event.target.value }
+                                : item,
                             ),
                           )
                         }
@@ -949,7 +942,9 @@ export default function TeacherAttendancePage() {
                         onChange={(event) =>
                           setStudents((current) =>
                             current.map((item) =>
-                              item.id === student.id ? { ...item, remarks: event.target.value } : item,
+                              item.id === student.id
+                                ? { ...item, remarks: event.target.value }
+                                : item,
                             ),
                           )
                         }
@@ -958,7 +953,9 @@ export default function TeacherAttendancePage() {
                     </div>
                   ))
                 ) : (
-                  <p className={emptyState}>No active students are enrolled in this class and semester.</p>
+                  <p className={emptyState}>
+                    No active students are enrolled in this class and semester.
+                  </p>
                 )}
               </div>
             ) : null}
@@ -1033,7 +1030,9 @@ export default function TeacherAttendancePage() {
                               Attend
                             </Button>
                           ) : (
-                            <span className="text-[12px] font-medium text-success">Marked present</span>
+                            <span className="text-[12px] font-medium text-success">
+                              Marked present
+                            </span>
                           )}
                         </div>
                       ))
@@ -1074,7 +1073,9 @@ export default function TeacherAttendancePage() {
                             </span>
                           ) : null}
                           {entry.loadError ? (
-                            <span className="text-xs font-medium text-danger">{entry.loadError}</span>
+                            <span className="text-xs font-medium text-danger">
+                              {entry.loadError}
+                            </span>
                           ) : null}
                           <span className="ml-auto text-[11px] text-muted">
                             Present {counts.present} of {entry.students.length}
@@ -1117,7 +1118,9 @@ export default function TeacherAttendancePage() {
                                   className={inputClass}
                                   value={student.status}
                                   onChange={(event) =>
-                                    setRosterStudent(key, student.id, { status: event.target.value })
+                                    setRosterStudent(key, student.id, {
+                                      status: event.target.value,
+                                    })
                                   }
                                 >
                                   <option value="">None</option>
@@ -1131,7 +1134,9 @@ export default function TeacherAttendancePage() {
                                   className={inputClass}
                                   value={student.remarks}
                                   onChange={(event) =>
-                                    setRosterStudent(key, student.id, { remarks: event.target.value })
+                                    setRosterStudent(key, student.id, {
+                                      remarks: event.target.value,
+                                    })
                                   }
                                   placeholder="Remarks"
                                 />
@@ -1155,7 +1160,11 @@ export default function TeacherAttendancePage() {
               <Modal
                 size="xl"
                 eyebrow={mergeEnabled ? mergedDate || sessionDate : sessionDate}
-                title={saveTargets.length > 1 ? `Confirm attendance — ${saveTargets.length} classes` : 'Confirm attendance'}
+                title={
+                  saveTargets.length > 1
+                    ? `Confirm attendance — ${saveTargets.length} classes`
+                    : 'Confirm attendance'
+                }
                 onClose={() => setSaveKeys(null)}
                 footer={
                   <>
@@ -1167,12 +1176,7 @@ export default function TeacherAttendancePage() {
                     >
                       Cancel
                     </Button>
-                    <Button
-                      type="button"
-                      variant="primary"
-                      onClick={commitSave}
-                      disabled={saving}
-                    >
+                    <Button type="button" variant="primary" onClick={commitSave} disabled={saving}>
                       <Save size={16} /> Save attendance
                     </Button>
                   </>

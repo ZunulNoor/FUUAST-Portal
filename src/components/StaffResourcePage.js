@@ -15,13 +15,7 @@ import ResourceFormModal from '@/components/resources/ResourceFormModal';
 import DetailModal from '@/components/resources/DetailModal';
 import TimetableGrid from '@/components/resources/TimetableGrid';
 import CoordinatorManageModal from '@/components/CoordinatorManageModal';
-import {
-  panel,
-  portalMain,
-  portalContent,
-  portalContentWide,
-  eyebrow,
-} from '@/components/ui/cx';
+import { panel, portalMain, portalContent, portalContentWide, eyebrow } from '@/components/ui/cx';
 
 export default function StaffResourcePage({ resource }) {
   const user = useAuthStore((state) => state.user);
@@ -197,11 +191,18 @@ export default function StaffResourcePage({ resource }) {
               {loading && rows.length === 0 ? (
                 <p className="py-10 text-center text-sm text-muted">Loading workspace...</p>
               ) : resource === 'timetable' && timetableView === 'grid' ? (
-                <TimetableGrid entries={rows} canEdit={canEdit} onEdit={openForm} onDelete={remove} />
+                <TimetableGrid
+                  entries={rows}
+                  canEdit={canEdit}
+                  onEdit={openForm}
+                  onDelete={remove}
+                />
               ) : (
                 <>
                   {loading ? (
-                    <p className="pb-2 text-right text-[11px] font-semibold text-muted">Updating…</p>
+                    <p className="pb-2 text-right text-[11px] font-semibold text-muted">
+                      Updating…
+                    </p>
                   ) : null}
                   <ResourceTable
                     resource={resource}

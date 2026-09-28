@@ -12,14 +12,7 @@ import { useConfirm } from '@/components/providers/ConfirmProvider';
 import { useToastStore } from '@/store/toastStore';
 import Button from '@/components/ui/Button';
 import { inputClass } from '@/components/ui/Field';
-import {
-  panel,
-  portalMain,
-  portalContent,
-  eyebrow,
-  formError,
-  errorTop,
-} from '@/components/ui/cx';
+import { panel, portalMain, portalContent, eyebrow, formError, errorTop } from '@/components/ui/cx';
 import { friendlyError } from '@/lib/apiError';
 
 export default function ScopedSettingPage({ setting = 'threshold' }) {

@@ -12,7 +12,10 @@ export default function TimetableDays({ form, setForm }) {
   const [editing, setEditing] = useState({});
 
   const setDay = (day, patch) =>
-    setForm({ ...form, days: { ...(form.days || {}), [day]: { ...(form.days?.[day] || {}), ...patch } } });
+    setForm({
+      ...form,
+      days: { ...(form.days || {}), [day]: { ...(form.days?.[day] || {}), ...patch } },
+    });
 
   const setEditingDay = (day, value) => setEditing((previous) => ({ ...previous, [day]: value }));
 
@@ -74,7 +77,10 @@ export default function TimetableDays({ form, setForm }) {
                         type="time"
                         value={value[label.toLowerCase() + '_time'] || ''}
                         onChange={(event) =>
-                          setDay(day, { enabled: true, [label.toLowerCase() + '_time']: event.target.value })
+                          setDay(day, {
+                            enabled: true,
+                            [label.toLowerCase() + '_time']: event.target.value,
+                          })
                         }
                         required
                       />

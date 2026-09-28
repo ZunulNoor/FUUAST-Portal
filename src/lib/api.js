@@ -64,7 +64,9 @@ const attachTokenInterceptor = (client) => {
             const res = await axios.post(
               `${PROXY_BASE}/auth/refresh`,
               { refreshToken },
-              { headers: { 'x-backend': isStudent ? PORTAL_BACKEND.student : PORTAL_BACKEND.staff } },
+              {
+                headers: { 'x-backend': isStudent ? PORTAL_BACKEND.student : PORTAL_BACKEND.staff },
+              },
             );
             const newAccessToken = res.data.accessToken;
             const newRefreshToken = res.data.refreshToken || refreshToken;
@@ -149,11 +151,7 @@ const attachCacheInterceptor = (client) => {
       if (response.fromCache) return response;
       const method = String(config.method || 'get').toLowerCase();
       if (method === 'get') {
-        if (
-          shouldCacheRequest(config) &&
-          response.status >= 200 &&
-          response.status < 300
-        ) {
+        if (shouldCacheRequest(config) && response.status >= 200 && response.status < 300) {
           setCached(config, response.data);
         }
       } else {

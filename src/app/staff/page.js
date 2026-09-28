@@ -18,13 +18,7 @@ import { useAuthStore } from '@/store/authStore';
 import PortalSidebar from '@/components/PortalSidebar';
 import PageHeader from '@/components/PageHeader';
 import { canAccessStaffResource, isSuperAdmin } from '@/lib/staffAccess';
-import {
-  portalMain,
-  portalContent,
-  eyebrow,
-  btnPrimary,
-  btnSecondary,
-} from '@/components/ui/cx';
+import { portalMain, portalContent, eyebrow, btnPrimary, btnSecondary } from '@/components/ui/cx';
 
 const baseLinks = [
   {

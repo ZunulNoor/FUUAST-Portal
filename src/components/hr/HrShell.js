@@ -9,11 +9,22 @@ import { portalMain, portalContent, portalContentWide } from '@/components/ui/cx
 
 export const HR_SELF = ['teacher', 'staff', 'super_admin'];
 export const HR_APPROVER = [
-  'super_admin', 'chairman', 'dean', 'deputy_registrar', 'registrar',
-  'vice_chancellor', 'management', 'teacher',
+  'super_admin',
+  'chairman',
+  'dean',
+  'deputy_registrar',
+  'registrar',
+  'vice_chancellor',
+  'management',
+  'teacher',
 ];
 export const HR_OFFICE = [
-  'super_admin', 'admin', 'chairman', 'deputy_registrar', 'registrar', 'management',
+  'super_admin',
+  'admin',
+  'chairman',
+  'deputy_registrar',
+  'registrar',
+  'management',
 ];
 export const HR_RULES = ['super_admin', 'deputy_registrar', 'registrar'];
 export const HR_RULES_WRITE = ['super_admin', 'deputy_registrar'];

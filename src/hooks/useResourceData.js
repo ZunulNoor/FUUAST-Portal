@@ -116,7 +116,9 @@ export default function useResourceData(resource) {
                   }
                 : {}),
               ...(resource === 'teachers' ? { search: search || undefined } : {}),
-              ...(resource === 'batches' ? { department_id: filters.department_id || undefined } : {}),
+              ...(resource === 'batches'
+                ? { department_id: filters.department_id || undefined }
+                : {}),
             };
       const response = await staffApi.get(roleConfig.endpoint, params ? { params } : undefined);
       const data = response.data?.data || response.data || [];
@@ -281,7 +283,19 @@ export default function useResourceData(resource) {
     if (!user) router.push('/staff/login');
     else if (canAccessStaffResource(user.role, resource, user.pageAccess)) load();
     else router.replace('/staff');
-  }, [hydrated, user, router, resource, search, page, filters.department_id, filters.semester_id, filters.batch_id, filters.class_id, filters.shift]);
+  }, [
+    hydrated,
+    user,
+    router,
+    resource,
+    search,
+    page,
+    filters.department_id,
+    filters.semester_id,
+    filters.batch_id,
+    filters.class_id,
+    filters.shift,
+  ]);
 
   useEffect(() => {
     if (!hydrated || !user) return;
@@ -367,10 +381,7 @@ export default function useResourceData(resource) {
       const seen = new Set();
       for (const offering of teacherOfferings) {
         if (!offering.class_id) continue;
-        if (
-          filters.semester_id &&
-          String(offering.semester_id) !== String(filters.semester_id)
-        )
+        if (filters.semester_id && String(offering.semester_id) !== String(filters.semester_id))
           continue;
         const key = String(offering.class_id);
         if (seen.has(key)) continue;
@@ -454,7 +465,9 @@ export default function useResourceData(resource) {
     const semesterChanged = String(prev.semester_id ?? '') !== String(form.semester_id ?? '');
 
     if (batchChanged && form.batch_id) {
-      const match = semesters.find((semester) => Number(semester.batch_id) === Number(form.batch_id));
+      const match = semesters.find(
+        (semester) => Number(semester.batch_id) === Number(form.batch_id),
+      );
       if (match && String(match.id) !== String(form.semester_id)) {
         prevBatchSemesterRef.current = { batch_id: form.batch_id, semester_id: match.id };
         setForm((current) => ({ ...(current || {}), semester_id: match.id }));
@@ -520,7 +533,9 @@ export default function useResourceData(resource) {
           }
         }
         setForm(null);
-        notifyAndReload(form.id ? 'Timetable updated successfully.' : 'Timetable saved successfully.');
+        notifyAndReload(
+          form.id ? 'Timetable updated successfully.' : 'Timetable saved successfully.',
+        );
         return;
       }
       if (resource === 'attendance') {
@@ -612,7 +627,9 @@ export default function useResourceData(resource) {
             (section) => !requestedSections.includes(section),
           );
           const targetSemesterId =
-            batchSemesters.find((semester) => semester.is_active)?.id || batchSemesters[0]?.id || null;
+            batchSemesters.find((semester) => semester.is_active)?.id ||
+            batchSemesters[0]?.id ||
+            null;
           for (const section of addedSections) {
             if (!targetSemesterId) {
               throw new Error('No semester is available to add the new section to.');
@@ -626,9 +643,7 @@ export default function useResourceData(resource) {
             });
           }
           for (const section of removedSections) {
-            const classRow = originalBatchClasses.find(
-              (entry) => entry.section_name === section,
-            );
+            const classRow = originalBatchClasses.find((entry) => entry.section_name === section);
             if (!classRow?.id) continue;
             await staffApi.delete(`/classes/${classRow.id}`);
           }
@@ -650,9 +665,7 @@ export default function useResourceData(resource) {
         ? await staffApi.put(`${roleConfig.endpoint}/${form.id}`, payload)
         : await staffApi.post(roleConfig.endpoint, payload);
       const temporaryPassword =
-        ['teachers', 'users'].includes(resource) &&
-        !form.id &&
-        response.data?.temporaryPassword
+        ['teachers', 'users'].includes(resource) && !form.id && response.data?.temporaryPassword
           ? response.data.temporaryPassword
           : null;
       setForm(null);
