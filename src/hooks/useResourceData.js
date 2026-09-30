@@ -27,6 +27,7 @@ export default function useResourceData(resource) {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState({});
   const [message, setMessage] = useState('');
   const [form, setForm] = useState(null);
   const [fieldOptions, setFieldOptions] = useState({});
@@ -69,6 +70,7 @@ export default function useResourceData(resource) {
         : config;
   const canCreate = !roleConfig?.createRoles || roleConfig.createRoles.includes(user?.role);
   const canEdit = !roleConfig?.editRoles || roleConfig.editRoles.includes(user?.role);
+  const canDelete = !roleConfig?.removeRoles || roleConfig.removeRoles.includes(user?.role);
   const canImport = !roleConfig?.importRoles || roleConfig.importRoles.includes(user?.role);
   const canDownloadTemplate =
     !roleConfig?.templateRoles || roleConfig.templateRoles.includes(user?.role);
@@ -150,12 +152,14 @@ export default function useResourceData(resource) {
 
   const closeForm = () => {
     setForm(null);
+    setFieldErrors({});
     setBatchSemesters([]);
     setOriginalBatchClasses([]);
   };
 
   const openForm = (row) => {
     setError('');
+    setFieldErrors({});
     setCredentialNotice('');
     const base = row || {};
     if (resource === 'timetable' && base.id) {
@@ -491,6 +495,7 @@ export default function useResourceData(resource) {
   const submit = async (event) => {
     event.preventDefault();
     setError('');
+    setFieldErrors({});
     setMessage('');
     const isUpdate = Boolean(form.id) || resource === 'assignments';
     if (isUpdate) {
@@ -542,7 +547,7 @@ export default function useResourceData(resource) {
         if (!form.batch_id) throw new Error('Select a batch.');
         if (!form.semester_id) throw new Error('Select a semester.');
         if (!form.subject_id && !form.subject_name) throw new Error('Select a subject.');
-        await staffApi.post(roleConfig.endpoint, {
+        const payload = {
           batch_id: form.batch_id,
           semester_id: form.semester_id,
           subject_id: form.subject_id,
@@ -550,9 +555,16 @@ export default function useResourceData(resource) {
           teacher_id: form.teacher_id,
           course_type: form.course_type,
           shift: form.shift,
-        });
+        };
+        if (form.id) {
+          await staffApi.put(`${roleConfig.endpoint}/${form.id}`, payload);
+        } else {
+          await staffApi.post(roleConfig.endpoint, payload);
+        }
         setForm(null);
-        notifyAndReload('Course allocation saved successfully.');
+        notifyAndReload(
+          form.id ? 'Course updated successfully.' : 'Course allocation saved successfully.',
+        );
         return;
       }
       if (resource === 'assignments') {
@@ -677,7 +689,13 @@ export default function useResourceData(resource) {
         notifyAndReload('Saved successfully.');
       }
     } catch (requestError) {
-      setError(friendlyError(requestError, 'Could not save. Check your entries and try again.'));
+      const fields = requestError.response?.data?.error?.fields;
+      if (fields && Object.keys(fields).length) {
+        setFieldErrors(fields);
+        setError(fields._form || '');
+      } else {
+        setError(friendlyError(requestError, 'Could not save. Check your entries and try again.'));
+      }
     }
   };
 
@@ -797,6 +815,8 @@ export default function useResourceData(resource) {
     loading,
     error,
     setError,
+    fieldErrors,
+    setFieldErrors,
     message,
     setMessage,
     credentialNotice,
@@ -823,6 +843,7 @@ export default function useResourceData(resource) {
     roleConfig,
     canCreate,
     canEdit,
+    canDelete,
     canImport,
     canDownloadTemplate,
     canExport,

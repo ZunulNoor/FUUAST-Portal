@@ -621,7 +621,7 @@ export default function TeacherAttendancePage() {
                   ))}
                 </select>
               </label>
-              <label className="grid min-w-[240px] flex-[2] gap-[7px] text-xs font-semibold text-brand-dark">
+              <label className="grid min-w-[200px] flex-[2] gap-[7px] text-xs font-semibold text-brand-dark">
                 Subject
                 <div className="relative min-w-0" ref={subjectBoxRef}>
                   <input
@@ -770,7 +770,7 @@ export default function TeacherAttendancePage() {
                   Load every section&apos;s roster
                 </label>
               </div>
-              <div className="grid min-w-[330px] flex-[2] grid-cols-2 items-end gap-[14px] [@media(max-width:560px)]:grid-cols-1">
+              <div className="grid w-full min-w-0 flex-[2] grid-cols-2 items-end gap-[14px] [@media(max-width:560px)]:grid-cols-1">
                 <label className="grid gap-[7px] text-xs font-semibold text-brand-dark">
                   Date
                   <input

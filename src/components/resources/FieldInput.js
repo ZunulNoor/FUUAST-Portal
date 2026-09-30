@@ -13,7 +13,11 @@ export default function FieldInput({
   visiblePasswords,
   togglePassword,
   className = '',
+  error,
 }) {
+  const errorText = error ? (
+    <p className="mt-1 text-xs font-medium text-danger">{error}</p>
+  ) : null;
   if (field.type === 'days') {
     return (
       <div className={className}>
@@ -24,13 +28,14 @@ export default function FieldInput({
 
   if (field.type === 'searchable-select' || field.type === 'creatable-select') {
     return (
-      <Field label={field.label} className={className}>
+      <Field label={field.label} className={className} hint={field.hint}>
         <SearchableSelect
           field={field}
           form={form}
           setForm={setForm}
           creatable={field.type === 'creatable-select'}
         />
+        {errorText}
       </Field>
     );
   }
@@ -105,6 +110,7 @@ export default function FieldInput({
             {isVisible ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
         </span>
+        {errorText}
       </Field>
     );
   }
@@ -112,7 +118,7 @@ export default function FieldInput({
   if (field.type === 'select') {
     const options = field.options || fieldOptions?.[field.name] || [];
     return (
-      <Field label={field.label} className={className}>
+      <Field label={field.label} className={className} hint={field.hint}>
         <select
           className={inputClass}
           value={form[field.name] || ''}
@@ -129,6 +135,7 @@ export default function FieldInput({
             </option>
           ))}
         </select>
+        {errorText}
       </Field>
     );
   }
@@ -143,6 +150,7 @@ export default function FieldInput({
         required={field.required}
         disabled={field.readOnly}
       />
+      {errorText}
     </Field>
   );
 }

@@ -26,6 +26,8 @@ export default function ResourceFormModal({
   form,
   setForm,
   fieldOptions,
+  fieldErrors,
+  setFieldErrors,
   visiblePasswords,
   togglePassword,
   error,
@@ -38,7 +40,24 @@ export default function ResourceFormModal({
   toDateInputValue,
 }) {
   const fieldInputProps = { form, setForm, fieldOptions, visiblePasswords, togglePassword };
-  const visibleFields = form?.id && config.editFields ? config.editFields : config.fields;
+  const visibleFields =
+    form?.id && config.editFields ? config.editFields : config.fields;
+  // Typing in a field clears its own error so fixed inputs stop complaining.
+  const handleFieldChange = (next) => {
+    const resolved = typeof next === 'function' ? next(form) : next;
+    if (resolved && form && setFieldErrors) {
+      const changed = Object.keys(resolved).filter((key) => resolved[key] !== form[key]);
+      if (changed.length) {
+        setFieldErrors((previous) => {
+          if (!previous) return previous;
+          const copy = { ...previous };
+          changed.forEach((key) => delete copy[key]);
+          return copy;
+        });
+      }
+    }
+    setForm(next);
+  };
 
   return (
     <Modal
@@ -54,8 +73,9 @@ export default function ResourceFormModal({
               config={config}
               user={user}
               form={form}
-              setForm={setForm}
+              setForm={handleFieldChange}
               fieldOptions={fieldOptions}
+              fieldErrors={fieldErrors}
               visiblePasswords={visiblePasswords}
               togglePassword={togglePassword}
               batchSemesters={batchSemesters}
@@ -70,8 +90,10 @@ export default function ResourceFormModal({
                 <FieldInput
                   key={field.name}
                   field={field}
+                  error={fieldErrors?.[field.name]}
                   className={field.type === 'days' ? 'sm:col-span-2' : ''}
                   {...fieldInputProps}
+                  setForm={handleFieldChange}
                 />
               ))}
             </div>

@@ -4,6 +4,9 @@
 export function friendlyError(error, fallback) {
   const status = error?.response?.status;
   const serverMessage = error?.response?.data?.error?.message;
+  if (error?.code === 'ECONNABORTED') {
+    return 'The request timed out. Check your connection and try again.';
+  }
   if (!error?.response) {
     return 'No connection to the server. Check your internet and try again.';
   }

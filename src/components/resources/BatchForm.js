@@ -12,6 +12,7 @@ export default function BatchForm({
   form,
   setForm,
   fieldOptions,
+  fieldErrors,
   visiblePasswords,
   togglePassword,
   batchSemesters,
@@ -20,6 +21,7 @@ export default function BatchForm({
 }) {
   const departmentField = config.fields.find((field) => field.name === 'department_id');
   const fieldInputProps = { form, setForm, fieldOptions, visiblePasswords, togglePassword };
+  const fieldError = (name) => fieldErrors?.[name];
   const departmentLocked = Boolean(form.id) || user?.role === 'admin';
   const creating = !form.id;
   const selectedSections = Array.isArray(form.sections) ? form.sections : [];
@@ -48,20 +50,24 @@ export default function BatchForm({
       ) : (
         <FieldInput
           field={{ ...departmentField, required: true }}
+          error={fieldError('department_id')}
           className="sm:col-span-2"
           {...fieldInputProps}
         />
       )}
       <FieldInput
         field={{ name: 'name', label: 'Batch name', required: true, type: 'text' }}
+        error={fieldError('name')}
         {...fieldInputProps}
       />
       <FieldInput
         field={{ name: 'start_year', label: 'Start year', required: true, type: 'number' }}
+        error={fieldError('start_year')}
         {...fieldInputProps}
       />
       <FieldInput
         field={{ name: 'end_year', label: 'End year', required: true, type: 'number' }}
+        error={fieldError('end_year')}
         {...fieldInputProps}
       />
       <Field

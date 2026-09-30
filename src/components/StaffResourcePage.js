@@ -34,6 +34,8 @@ export default function StaffResourcePage({ resource }) {
     credentialNotice,
     form,
     fieldOptions,
+    fieldErrors,
+    setFieldErrors,
     visiblePasswords,
     search,
     setSearch,
@@ -58,6 +60,7 @@ export default function StaffResourcePage({ resource }) {
     togglePassword,
     canCreate,
     canEdit,
+    canDelete,
     canImport,
     canDownloadTemplate,
     canExport,
@@ -78,10 +81,7 @@ export default function StaffResourcePage({ resource }) {
     !hydrated ||
     !user ||
     !roleConfig ||
-    !(
-      canAccessStaffResource(user.role, resource, user.pageAccess) ||
-      (resource === 'teachers' && user.role === 'teacher' && user.isCoordinator)
-    )
+    !canAccessStaffResource(user.role, resource, user.pageAccess)
   )
     return null;
 
@@ -191,12 +191,7 @@ export default function StaffResourcePage({ resource }) {
               {loading && rows.length === 0 ? (
                 <p className="py-10 text-center text-sm text-muted">Loading workspace...</p>
               ) : resource === 'timetable' && timetableView === 'grid' ? (
-                <TimetableGrid
-                  entries={rows}
-                  canEdit={canEdit}
-                  onEdit={openForm}
-                  onDelete={remove}
-                />
+                <TimetableGrid entries={rows} canEdit={canEdit} canDelete={canDelete} onEdit={openForm} onDelete={remove} />
               ) : (
                 <>
                   {loading ? (
@@ -210,6 +205,7 @@ export default function StaffResourcePage({ resource }) {
                     rows={rows}
                     roleConfig={roleConfig}
                     canEdit={canEdit}
+                    canDelete={canDelete}
                     canManageCoordinator={canManageCoordinator}
                     onView={openDetail}
                     onEdit={openForm}
@@ -233,6 +229,8 @@ export default function StaffResourcePage({ resource }) {
           form={form}
           setForm={data.setForm}
           fieldOptions={fieldOptions}
+          fieldErrors={fieldErrors}
+          setFieldErrors={setFieldErrors}
           visiblePasswords={visiblePasswords}
           togglePassword={togglePassword}
           error={error}
@@ -268,7 +266,7 @@ export default function StaffResourcePage({ resource }) {
         <Modal
           size="xl"
           eyebrow="IMPORT CHECKLIST"
-          title={`${importReport.skippedCount || 0} duplicate row(s) skipped`}
+          title={`${importReport.skippedCount || 0} row(s) skipped`}
           onClose={() => setImportReport(null)}
         >
           <div className="min-w-0 overflow-y-auto p-5 sm:px-6">

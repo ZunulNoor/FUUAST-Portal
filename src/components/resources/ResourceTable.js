@@ -10,6 +10,7 @@ export default function ResourceTable({
   rows,
   roleConfig,
   canEdit,
+  canDelete,
   canManageCoordinator,
   onView,
   onEdit,
@@ -91,7 +92,7 @@ export default function ResourceTable({
                       Edit
                     </button>
                   ) : null}
-                  {roleConfig.remove ? (
+                  {roleConfig.remove && canDelete ? (
                     <button
                       type="button"
                       onClick={() => onDelete(row.id)}

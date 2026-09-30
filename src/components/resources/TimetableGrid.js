@@ -91,7 +91,7 @@ const buildSegments = (layerEntries, minStart, totalRange) => {
   return segments;
 };
 
-export default function TimetableGrid({ entries = [], canEdit = false, onEdit, onDelete }) {
+export default function TimetableGrid({ entries = [], canEdit = false, canDelete = false, onEdit, onDelete }) {
   const list = entries.filter(
     (entry) => entry && entry.day_of_week && entry.start_time && entry.end_time,
   );
@@ -173,32 +173,36 @@ export default function TimetableGrid({ entries = [], canEdit = false, onEdit, o
                                     color: textOn(entryColor(seg.entry, si)),
                                   }}
                                 >
-                                  {canEdit ? (
+                                  {canEdit || canDelete ? (
                                     <div className="absolute right-1 top-1 hidden gap-1 group-hover:flex">
-                                      <button
-                                        type="button"
-                                        onClick={(event) => {
-                                          event.stopPropagation();
-                                          if (onEdit) onEdit(seg.entry);
-                                        }}
-                                        title="Edit class"
-                                        aria-label="Edit class"
-                                        className="grid h-6 w-6 place-items-center rounded-md bg-black/25 text-current backdrop-blur-[2px] transition hover:bg-black/40"
-                                      >
-                                        <Pencil size={13} />
-                                      </button>
-                                      <button
-                                        type="button"
-                                        onClick={(event) => {
-                                          event.stopPropagation();
-                                          if (onDelete) onDelete(seg.entry.id);
-                                        }}
-                                        title="Delete class"
-                                        aria-label="Delete class"
-                                        className="grid h-6 w-6 place-items-center rounded-md bg-black/25 text-current backdrop-blur-[2px] transition hover:bg-black/40"
-                                      >
-                                        <Trash2 size={13} />
-                                      </button>
+                                      {canEdit ? (
+                                        <button
+                                          type="button"
+                                          onClick={(event) => {
+                                            event.stopPropagation();
+                                            if (onEdit) onEdit(seg.entry);
+                                          }}
+                                          title="Edit class"
+                                          aria-label="Edit class"
+                                          className="grid h-6 w-6 place-items-center rounded-md bg-black/25 text-current backdrop-blur-[2px] transition hover:bg-black/40"
+                                        >
+                                          <Pencil size={13} />
+                                        </button>
+                                      ) : null}
+                                      {canDelete ? (
+                                        <button
+                                          type="button"
+                                          onClick={(event) => {
+                                            event.stopPropagation();
+                                            if (onDelete) onDelete(seg.entry.id);
+                                          }}
+                                          title="Delete class"
+                                          aria-label="Delete class"
+                                          className="grid h-6 w-6 place-items-center rounded-md bg-black/25 text-current backdrop-blur-[2px] transition hover:bg-black/40"
+                                        >
+                                          <Trash2 size={13} />
+                                        </button>
+                                      ) : null}
                                     </div>
                                   ) : null}
                                   <div className="flex min-w-0 items-center justify-between gap-1">
